@@ -31,7 +31,7 @@ describe('browser/settings.html', function() {
     }
   });
 
-  it('should show index.thml when Cancel button is clicked', function() {
+  it('should show index.html when Cancel button is clicked', function() {
     env.addClientCommands(this.app.client);
     return this.app.client
       .loadSettingsPage()
@@ -40,7 +40,7 @@ describe('browser/settings.html', function() {
       .getUrl().should.eventually.match(/\/index.html$/)
   });
 
-  it('should show index.thml when Save button is clicked', function() {
+  it('should show index.html when Save button is clicked', function() {
     env.addClientCommands(this.app.client);
     return this.app.client
       .loadSettingsPage()
@@ -65,6 +65,7 @@ describe('browser/settings.html', function() {
             env.addClientCommands(this.app.client);
             return this.app.client
               .loadSettingsPage()
+              .scroll('#inputHideMenuBar')
               .isSelected('#inputHideMenuBar input').then((isSelected) => {
                 if (isSelected !== v) {
                   return this.app.client.click('#inputHideMenuBar input')
@@ -96,6 +97,7 @@ describe('browser/settings.html', function() {
           env.addClientCommands(this.app.client);
           return this.app.client
             .loadSettingsPage()
+            .scroll('#inputDisableWebSecurity')
             .isSelected('#inputDisableWebSecurity input').then((isSelected) => {
               if (isSelected !== v) {
                 return this.app.client.click('#inputDisableWebSecurity input')
@@ -171,13 +173,13 @@ describe('browser/settings.html', function() {
       });
     });
 
-    describe('Notifications', function() {
+    describe('Flash taskbar icon on new messages', function() {
       it('should appear on win32 and linux', function() {
         const expected = (process.platform === 'win32' || process.platform === 'linux');
         env.addClientCommands(this.app.client);
         return this.app.client
           .loadSettingsPage()
-          .isExisting('#notificationsRow').should.eventually.equal(expected)
+          .isExisting('#inputflashWindow').should.eventually.equal(expected)
       });
     });
 

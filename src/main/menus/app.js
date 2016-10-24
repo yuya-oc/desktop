@@ -36,7 +36,7 @@ var createTemplate = function(mainWindow, config) {
   }, separatorItem, {
     role: 'quit'
   }] : [{
-    label: 'Settings',
+    label: 'Settings...',
     accelerator: 'CmdOrCtrl+,',
     click: function(item, focusedWindow) {
       mainWindow.loadURL('file://' + __dirname + '/browser/settings.html');
@@ -70,8 +70,8 @@ var createTemplate = function(mainWindow, config) {
     }, {
       role: 'selectall'
     }, separatorItem, {
-      label: 'Search in Channel',
-      accelerator: 'CmdOrCtrl+F',
+      label: 'Search in Team',
+      accelerator: 'CmdOrCtrl+S',
       click: (item, focusedWindow) => {
         if (focusedWindow) {
           focusedWindow.webContents.send('activate-search-box');
@@ -124,6 +124,13 @@ var createTemplate = function(mainWindow, config) {
         mainWindow.webContents.send('zoom-in', 1);
       }
     }, {
+      label: 'Zoom In (hidden)',
+      accelerator: 'CmdOrCtrl+=',
+      visible: false,
+      click: () => {
+        mainWindow.webContents.send('zoom-in', 1);
+      }
+    }, {
       label: 'Zoom Out',
       accelerator: 'CmdOrCtrl+-',
       click: () => {
@@ -146,6 +153,37 @@ var createTemplate = function(mainWindow, config) {
       }
     }]
   });
+  template.push({
+    label: '&History',
+    submenu: [{
+      label: 'Back',
+      accelerator: process.platform === 'darwin' ? 'Cmd+[' : 'Alt+Left',
+      click: (item, focusedWindow) => {
+        if (focusedWindow === mainWindow) {
+          mainWindow.webContents.send('go-back');
+        }
+        else {
+          if (focusedWindow.webContents.canGoBack()) {
+            focusedWindow.goBack();
+          }
+        }
+      }
+    }, {
+      label: 'Forward',
+      accelerator: process.platform === 'darwin' ? 'Cmd+]' : 'Alt+Right',
+      click: (item, focusedWindow) => {
+        if (focusedWindow === mainWindow) {
+          mainWindow.webContents.send('go-forward');
+        }
+        else {
+          if (focusedWindow.webContents.canGoForward()) {
+            focusedWindow.goForward();
+          }
+        }
+      }
+    }]
+  });
+
 
   const window_menu = {
     label: '&Window',
@@ -183,9 +221,9 @@ var createTemplate = function(mainWindow, config) {
   template.push({
     label: '&Help',
     submenu: [{
-      label: `${app_name} Docs`,
+      label: `Learn More...`,
       click: function() {
-        electron.shell.openExternal('http://docs.mattermost.com');
+        electron.shell.openExternal('https://docs.mattermost.com/help/apps/desktop-guide.html');
       }
     }, {
       type: 'separator'

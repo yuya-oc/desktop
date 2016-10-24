@@ -8,7 +8,8 @@ const {
   ipcMain,
   nativeImage,
   dialog,
-  systemPreferences
+  systemPreferences,
+  session
 } = require('electron');
 
 process.on('uncaughtException', (error) => {
@@ -17,18 +18,31 @@ process.on('uncaughtException', (error) => {
 
 if (process.platform === 'win32') {
   var cmd = process.argv[1];
+  var AutoLaunch = require('auto-launch');
+  var appLauncher = new AutoLaunch({
+    name: 'Mattermost',
+    isHidden: true
+  });
   if (cmd === '--squirrel-uninstall') {
-    var AutoLaunch = require('auto-launch');
-    var appLauncher = new AutoLaunch({
-      name: 'Mattermost'
-    });
+    // If we're uninstalling, make sure we also delete our auto launch registry key
     appLauncher.isEnabled().then(function(enabled) {
       if (enabled)
         appLauncher.disable();
     });
   }
+  else if (cmd === '--squirrel-install' || cmd === '--squirrel-updated') {
+    // If we're updating and already have an registry entry for auto launch, make sure to update the path
+    appLauncher.isEnabled().then(function(enabled) {
+      if (enabled) {
+        return appLauncher.disable().then(function() {
+          return appLauncher.enable();
+        });
+      }
+    });
+  }
 }
 
+app.setAppUserModelId('com.squirrel.mattermost.Mattermost'); // Use explicit AppUserModelID
 require('electron-squirrel-startup');
 
 const fs = require('fs');
@@ -40,7 +54,8 @@ var certificateStore = require('./main/certificateStore').load(path.resolve(app.
 var appMenu = require('./main/menus/app');
 const allowProtocolDialog = require('./main/allowProtocolDialog');
 
-var argv = require('yargs').argv;
+var argv = require('yargs')
+  .parse(process.argv.slice(1));
 
 var client = null;
 if (argv.livereload) {
@@ -50,6 +65,12 @@ if (argv.livereload) {
   });
 }
 
+var hideOnStartup;
+if (argv.hidden) {
+  hideOnStartup = true;
+}
+
+// TODO: We should document this if that hasn't been done already
 if (argv['config-file']) {
   global['config-file'] = argv['config-file'];
 }
@@ -355,6 +376,23 @@ app.on('ready', function() {
   window_options.title = app.getName();
   mainWindow = new BrowserWindow(window_options);
 
+  if (process.platform === 'darwin') {
+    session.defaultSession.on('will-download', (event, item, webContents) => {
+      var filename = item.getFilename();
+      var savePath = dialog.showSaveDialog({
+        title: filename,
+        defaultPath: require('os').homedir() + '/Downloads/' + filename
+      });
+
+      if (savePath) {
+        item.setSavePath(savePath);
+      }
+      else {
+        item.cancel();
+      }
+    });
+  }
+
   mainWindow.webContents.on('crashed', () => {
     console.log('The application has crashed.');
   });
@@ -364,11 +402,16 @@ app.on('ready', function() {
   });
 
   mainWindow.setFullScreenable(true); // fullscreenable option has no effect.
-  if (window_options.maximized) {
-    mainWindow.maximize();
+  if (hideOnStartup) {
+    mainWindow.minimize();
   }
-  if (window_options.fullscreen) {
-    mainWindow.setFullScreen(true);
+  else {
+    if (window_options.maximized) {
+      mainWindow.maximize();
+    }
+    if (window_options.fullscreen) {
+      mainWindow.setFullScreen(true);
+    }
   }
 
   // and load the index.html of the app.

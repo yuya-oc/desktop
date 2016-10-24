@@ -147,12 +147,12 @@ Below lists menu options (shortcut keys are listed in brackets, `Ctrl` becomes `
   - **Quit** (Ctrl+Q) - Exits the application
 - **Edit**
   - **Undo** (Ctrl+Z) - Reverses previous action
-  - **Redo** (Ctrl+Shift+Z) - Replays most recent action
+  - **Redo** (Ctrl+Shift+Z, Ctrl+Y on Windows) - Replays most recent action
   - **Cut** (Ctrl+X) - Cuts selected text
   - **Copy** (Ctrl+C) - Copies selected text
   - **Paste** (Ctrl+V) - Pastes text from clipboard
   - **Select All** (Ctrl+A) - Select all text in input box
-  - **Search in Channel** (Ctrl+F) - Puts cursor in search box to search in current channel
+  - **Search in Team** (Ctrl+S) - Puts cursor in search box to search in the current team
 - **View**
   - **Reload** (Ctrl+R) - Reload page from the server
   - **Clear Cache and Reload** (Ctrl+Shift+R) - Clear cached content in application and reload page
@@ -161,6 +161,9 @@ Below lists menu options (shortcut keys are listed in brackets, `Ctrl` becomes `
   - **Actual Size** (Ctrl+0) - Reset zoom level
   - **Zoom In** (Ctrl+Plus) - Enlarge the rendered contents size
   - **Zoom In** (Ctrl+Minus) - Shrink the rendered contents size
+- **History**
+  - **Back** (Alt+Left, Command+[ on OS X) - Go back to previous web page in the current tab
+  - **Forward** (Alt+Right, Command+] on OS X) - Go forward to next web page in the current tab
 - **Window**
   - **Close** (Ctrl+W) - Close the window (On Window and Linux, the main window is minimized)
   - **Minimize** (Ctrl+M) - Minimize the window
@@ -168,7 +171,7 @@ Below lists menu options (shortcut keys are listed in brackets, `Ctrl` becomes `
   - **Select Next Team** (Ctrl+Tab, Alt+Command+Right) - Open the right tab
   - **Select Previous Team** (Ctrl+Shift+Tab, Alt+Command+Left) - Open the left tab
 - **Help**
-  - ***Mattermost Docs*** Links to the official mattermost documentation
+  - ***Learn More*** Links to the official mattermost documentation
   - ***Version*** Indicate the application version
 
 

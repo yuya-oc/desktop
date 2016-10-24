@@ -9,20 +9,13 @@ const settings = require('../common/settings');
 
 const React = require('react');
 const ReactDOM = require('react-dom');
-const ReactBootstrap = require('react-bootstrap');
+const {Grid, Row, Col, Input, Button, ListGroup, ListGroupItem, Glyphicon, HelpBlock, Navbar, Nav} = require('react-bootstrap');
 var AutoLaunch = require('auto-launch');
 
-const Grid = ReactBootstrap.Grid;
-const Row = ReactBootstrap.Row;
-const Col = ReactBootstrap.Col;
-const Input = ReactBootstrap.Input;
-const Button = ReactBootstrap.Button;
-const ListGroup = ReactBootstrap.ListGroup;
-const ListGroupItem = ReactBootstrap.ListGroupItem;
-const Glyphicon = ReactBootstrap.Glyphicon;
 
 var appLauncher = new AutoLaunch({
-  name: 'Mattermost'
+  name: 'Mattermost',
+  isHidden: true
 });
 
 function backToIndex() {
@@ -148,10 +141,10 @@ var SettingsPage = React.createClass({
       showAddTeamForm: !this.state.showAddTeamForm
     });
   },
-  handleFlashWindowSetting: function(item) {
+  handleFlashWindow: function() {
     this.setState({
       notifications: {
-        flashWindow: item.state
+        flashWindow: this.refs.flashWindow.getChecked() ? 2 : 0
       }
     });
   },
@@ -207,78 +200,85 @@ var SettingsPage = React.createClass({
                      checked={ this.state.showUnreadBadge } onChange={ this.handleShowUnreadBadge } />);
     }
 
+    if (process.platform === 'win32' || process.platform === 'linux') {
+      options.push(<Input key="flashWindow" id="inputflashWindow" ref="flashWindow" type="checkbox" label="Flash the taskbar icon when a new message is received." checked={ this.state.notifications.flashWindow === 2 }
+                     onChange={ this.handleFlashWindow } />);
+    }
+
+    const settingsPage = {
+      navbar: {
+        backgroundColor: '#fff'
+      },
+      close: {
+        position: 'absolute',
+        right: '0',
+        top: '10px',
+        fontSize: '35px',
+        fontWeight: 'normal',
+        color: '#bbb',
+        cursor: 'pointer'
+      },
+      heading: {
+        textAlign: 'center',
+        fontSize: '24px',
+        margin: '0',
+        padding: '1em 0'
+      },
+      sectionHeading: {
+        fontSize: '20px',
+        margin: '0',
+        padding: '1em 0'
+      },
+      sectionHeadingLink: {
+        marginTop: '24px',
+        display: 'inline-block',
+        fontSize: '15px'
+      },
+      footer: {
+        padding: '0.4em 0'
+      }
+    }
+
     var options_row = (options.length > 0) ? (
       <Row>
         <Col md={ 12 }>
-        <h2>Options</h2>
+        <h2 style={ settingsPage.sectionHeading }>App options</h2>
         { options }
         </Col>
       </Row>
       ) : null;
 
-    var notifications_row = null;
-    if (process.platform === 'win32' || process.platform === 'linux') {
-      var notificationSettings = [
-        {
-          label: 'Never',
-          state: 0
-        },
-        /* ToDo: Idle isn't implemented yet
-        {
-          label: 'Only when idle (after 10 seconds)',
-          state: 1
-        },*/
-        {
-          label: 'Always',
-          state: 2
-        }
-      ];
-
-      var that = this;
-      var notificationElements = notificationSettings.map(function(item) {
-        var boundClick = that.handleFlashWindowSetting.bind(that, item);
-        return (
-          <Input key={ "flashWindow" + item.state } name="handleFlashWindow" ref={ "flashWindow" + item.state } type="radio" label={ item.label } value={ item.state } onChange={ boundClick }
-            checked={ that.state.notifications.flashWindow == item.state ? "checked" : "" } />
-          );
-      });
-
-      notifications_row = (
-        <Row id="notificationsRow">
-          <Col md={ 12 }>
-          <h3>Notifications</h3> Flash the taskbar icon when a new message is received.
-          { notificationElements }
-          </Col>
-        </Row>
-      );
-    }
-
     return (
-      <Grid className="settingsPage">
-        <Row>
-          <Col xs={ 4 } sm={ 2 } md={ 2 } lg={ 1 }>
-          <h2>Teams</h2>
-          </Col>
-          <Col xs={ 8 } sm={ 10 } md={ 10 } lg={ 11 }>
-          <Button bsSize="small" style={ { marginTop: 20 } } onClick={ this.toggleShowTeamForm }>
-            <Glyphicon glyph="plus" />
-          </Button>
-          </Col>
-        </Row>
-        { teams_row }
-        { options_row }
-        { notifications_row }
-        <div>
-          <hr />
-        </div>
-        <Row>
-          <Col md={ 12 }>
-          <Button id="btnCancel" onClick={ this.handleCancel }>Cancel</Button>
-          { ' ' }
-          <Button id="btnSave" bsStyle="primary" onClick={ this.handleSave } disabled={ this.state.teams.length === 0 }>Save</Button>
-          </Col>
-        </Row>
-      </Grid>
+      <div>
+        <Navbar className="navbar-fixed-top" style={ settingsPage.navbar }>
+          <div style={ { 'position': 'relative' } }>
+            <h1 style={ settingsPage.heading }>Settings</h1>
+            <div style={ settingsPage.close } onClick={ this.handleCancel }>
+              <span>×</span>
+            </div>
+          </div>
+        </Navbar>
+        <Grid className="settingsPage" style={ { 'padding': '100px 15px' } }>
+          <Row>
+            <Col md={ 10 } xs={ 8 }>
+            <h2 style={ settingsPage.sectionHeading }>Team Management</h2>
+            </Col>
+            <Col md={ 2 } xs={ 4 }>
+            <p className="text-right"><a style={ settingsPage.sectionHeadingLink } href="#" onClick={ this.toggleShowTeamForm }>⊞ Add new team</a></p>
+            </Col>
+          </Row>
+          { teams_row }
+          <hr/>
+          { options_row }
+        </Grid>
+        <Navbar className="navbar-fixed-bottom">
+          <div className='text-right' style={ settingsPage.footer }>
+            <button id="btnCancel" className="btn btn-link" onClick={ this.handleCancel }>Cancel</button>
+            { ' ' }
+            <button id="btnSave" className="btn btn-primary navbar-btn" bsStyle="primary" onClick={ this.handleSave } disabled={ this.state.teams.length === 0 }>Save</button>
+          </div>
+        </Navbar>
+      </div>
       );
   }
 });
@@ -388,13 +388,9 @@ var TeamListItem = React.createClass({
           </p>
         </div>
         <div className="pull-right">
-          <Button bsSize="xsmall" onClick={ this.handleTeamEditing }>
-            <Glyphicon glyph="pencil" />
-          </Button>
-          { ' ' }
-          <Button bsSize="xsmall" onClick={ this.handleTeamRemove }>
-            <Glyphicon glyph="remove" />
-          </Button>
+          <a href="#" onClick={ this.handleTeamEditing }>Edit</a>
+          { ' - ' }
+          <a href="#" onClick={ this.handleTeamRemove }>Remove</a>
         </div>
       </div>
       );
@@ -406,12 +402,21 @@ var TeamListItemNew = React.createClass({
     return {
       name: this.props.teamName,
       url: this.props.teamUrl,
-      index: this.props.teamIndex
+      index: this.props.teamIndex,
+      errorMessage: null
     };
   },
   handleSubmit: function(e) {
     console.log('submit');
     e.preventDefault();
+    const errorMessage = this.getValidationErrorMessage();
+    if (errorMessage) {
+      this.setState({
+        errorMessage
+      });
+      return;
+    }
+
     this.props.onTeamAdd({
       name: this.state.name.trim(),
       url: this.state.url.trim(),
@@ -421,7 +426,8 @@ var TeamListItemNew = React.createClass({
     this.setState({
       name: '',
       url: '',
-      index: ''
+      index: '',
+      errorMessage: null
     });
   },
   handleNameChange: function(e) {
@@ -436,10 +442,30 @@ var TeamListItemNew = React.createClass({
       url: e.target.value
     });
   },
-  shouldEnableAddButton: function() {
-    return (this.state.name.trim() !== '' || this.props.teamName !== '')
-      && (this.state.url.trim() !== '' || this.props.teamUrl !== '');
+
+  getValidationErrorMessage: function() {
+    if (this.state.name.trim() === '') {
+      return 'Name is required.';
+    } else if (this.state.url.trim() === '') {
+      return 'URL is required.';
+    } else if (!(/^https?:\/\/.*/).test(this.state.url.trim())) {
+      return 'URL should start with http:// or https://.';
+    }
+    return null;
   },
+
+  componentDidMount: function() {
+    const inputTeamName = ReactDOM.findDOMNode(this.refs.inputTeamName);
+    const setErrorMessage = () => {
+      this.setState({
+        errorMessage: this.getValidationErrorMessage()
+      });
+    };
+    inputTeamName.addEventListener('invalid', setErrorMessage);
+    const inputTeamURL = ReactDOM.findDOMNode(this.refs.inputTeamURL);
+    inputTeamURL.addEventListener('invalid', setErrorMessage);
+  },
+
   render: function() {
 
     var existingTeam = false;
@@ -460,19 +486,29 @@ var TeamListItemNew = React.createClass({
           <div className="form-group">
             <label for="inputTeamName">Name</label>
             { ' ' }
-            <input type="text" className="form-control" id="inputTeamName" placeholder="Example team" value={ this.state.name } onChange={ this.handleNameChange } />
+            <input type="text" required className="form-control" id="inputTeamName" ref="inputTeamName" placeholder="Example team" value={ this.state.name } onChange={ this.handleNameChange }
+            />
           </div>
           { ' ' }
           <div className="form-group">
             <label for="inputTeamURL">URL</label>
             { ' ' }
-            <input type="url" className="form-control" id="inputTeamURL" placeholder="https://example.com/team" value={ this.state.url } onChange={ this.handleURLChange } />
+            <input type="url" required className="form-control" id="inputTeamURL" ref="inputTeamURL" placeholder="https://example.com/team" value={ this.state.url } onChange={ this.handleURLChange }
+            />
           </div>
           { ' ' }
-          <Button type="submit" disabled={ !this.shouldEnableAddButton() }>
+          <Button type="submit">
             { btnAddText }
           </Button>
         </form>
+        { (() => {
+            if (this.state.errorMessage !== null) {
+              return (<HelpBlock style={ { color: '#777777' } }>
+                        { this.state.errorMessage }
+                      </HelpBlock>);
+            }
+            return null;
+          })() }
       </ListGroupItem>
       );
   }
@@ -480,11 +516,9 @@ var TeamListItemNew = React.createClass({
 
 var configFile = remote.getGlobal('config-file');
 
-var contextMenu = require('./menus/context');
-var menu = contextMenu.createDefault();
-window.addEventListener('contextmenu', function(e) {
-  menu.popup(remote.getCurrentWindow());
-}, false);
+require('electron-context-menu')({
+  window: remote.getCurrentWindow()
+});
 
 ReactDOM.render(
   <SettingsPage configFile={ configFile } />,

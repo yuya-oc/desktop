@@ -81,11 +81,15 @@ var MainPage = React.createClass({
       webview.send('activate-search-box');
     });
 
-    var focusListener = function() {
-      var webview = document.getElementById('mattermostView' + thisObj.state.key);
-      webview.focus();
+    // activate search box in current chunnel
+    ipcRenderer.on('activate-search-box-in-channel', (event) => {
+      let webview = document.getElementById('mattermostView' + thisObj.state.key);
+      webview.send('activate-search-box-in-channel');
+    });
 
+    var focusListener = function() {
       thisObj.handleOnTeamFocused(thisObj.state.key);
+      thisObj.refs[`mattermostView${thisObj.state.key}`].focusOnWebView();
     };
 
     var currentWindow = remote.getCurrentWindow();
@@ -93,15 +97,35 @@ var MainPage = React.createClass({
     window.addEventListener('beforeunload', function() {
       currentWindow.removeListener('focus', focusListener);
     });
+
+    //goBack and goForward
+    ipcRenderer.on('go-back', () => {
+      const mattermost = thisObj.refs[`mattermostView${thisObj.state.key}`];
+      if (mattermost.canGoBack()) {
+        mattermost.goBack();
+      }
+    });
+
+    ipcRenderer.on('go-forward', () => {
+      const mattermost = thisObj.refs[`mattermostView${thisObj.state.key}`];
+      if (mattermost.canGoForward()) {
+        mattermost.goForward();
+      }
+    });
+  },
+  componentDidUpdate: function(prevProps, prevState) {
+    if (prevState.key !== this.state.key) { // i.e. When tab has been changed
+      this.refs[`mattermostView${this.state.key}`].focusOnWebView();
+    }
   },
   handleSelect: function(key) {
     const newKey = (this.props.teams.length + key) % this.props.teams.length;
     this.setState({
       key: newKey
     });
-    this.handleOnTeamFocused(key);
+    this.handleOnTeamFocused(newKey);
 
-    var webview = document.getElementById('mattermostView' + key);
+    var webview = document.getElementById('mattermostView' + newKey);
     ipcRenderer.send('update-title', {
       title: webview.getTitle()
     });
@@ -324,8 +348,7 @@ var MattermostView = React.createClass({
 
     webview.addEventListener('did-fail-load', function(e) {
       console.log(thisObj.props.name, 'webview did-fail-load', e);
-      if (e.errorCode === -3 || // An operation was aborted (due to user action).
-        e.errorCode === -300) { //The operation was aborted to invalidate application cache
+      if (e.errorCode === -3) { // An operation was aborted (due to user action).
         return;
       }
 
@@ -360,13 +383,6 @@ var MattermostView = React.createClass({
       }
     });
 
-    webview.addEventListener("did-start-loading", function() {
-      if (!webview.cacheInvalidated) {
-        webview.reloadIgnoringCache();
-        webview.cacheInvalidated = true;
-      }
-    });
-
     webview.addEventListener("dom-ready", function() {
       // webview.openDevTools();
 
@@ -395,6 +411,10 @@ var MattermostView = React.createClass({
           }
         });
       }
+
+      require('electron-context-menu')({
+        window: webview
+      });
     });
 
     webview.addEventListener('ipc-message', function(event) {
@@ -455,6 +475,35 @@ var MattermostView = React.createClass({
       webContents.reload();
     });
   },
+
+  focusOnWebView: function() {
+    const webview = ReactDOM.findDOMNode(this.refs.webview);
+    if (!webview.getWebContents().isFocused()) {
+      webview.focus();
+      webview.getWebContents().focus();
+    }
+  },
+
+  canGoBack() {
+    const webview = ReactDOM.findDOMNode(this.refs.webview);
+    return webview.getWebContents().canGoBack();
+  },
+
+  canGoForward() {
+    const webview = ReactDOM.findDOMNode(this.refs.webview);
+    return webview.getWebContents().canGoForward();
+  },
+
+  goBack() {
+    const webview = ReactDOM.findDOMNode(this.refs.webview);
+    webview.getWebContents().goBack();
+  },
+
+  goForward() {
+    const webview = ReactDOM.findDOMNode(this.refs.webview);
+    webview.getWebContents().goForward();
+  },
+
   render: function() {
     const errorView = this.state.errorInfo ? (<ErrorView id={ this.props.id + '-fail' } style={ this.props.style } className="errorView" errorInfo={ this.state.errorInfo }></ErrorView>) : null;
     // 'disablewebsecurity' is necessary to display external images.
@@ -470,29 +519,67 @@ var MattermostView = React.createClass({
 });
 
 // ErrorCode: https://code.google.com/p/chromium/codesearch#chromium/src/net/base/net_error_list.h
-// FIXME: need better wording in English
+const errorPage = {
+  tableStyle: {
+    display: 'table',
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+    top: '0',
+    left: '0'
+  },
+
+  cellStyle: {
+    display: 'table-cell',
+    verticalAlign: 'middle'
+  },
+
+  bullets: {
+    paddingLeft: '15px',
+    lineHeight: '1.7'
+  },
+
+  techInfo: {
+    fontSize: '12px',
+    color: '#aaa'
+  },
+};
+
 var ErrorView = React.createClass({
   render: function() {
     return (
       <Grid id={ this.props.id } style={ this.props.style }>
-        <h1>Failed to load the URL</h1>
-        <p>
-          { 'URL: ' }
-          { this.props.errorInfo.validatedURL }
-        </p>
-        <p>
-          { 'Error code: ' }
-          { this.props.errorInfo.errorCode }
-        </p>
-        <p>
-          { this.props.errorInfo.errorDescription }
-        </p>
-        <p>Please check below. Then, reload this window. (Ctrl+R or Command+R)</p>
-        <ListGroup>
-          <ListGroupItem>Is your computer online?</ListGroupItem>
-          <ListGroupItem>Is the server alive?</ListGroupItem>
-          <ListGroupItem>Is the URL correct?</ListGroupItem>
-        </ListGroup>
+        <div style={ errorPage.tableStyle }>
+          <div style={ errorPage.cellStyle }>
+            <Row>
+              <Col xs={ 0 } sm={ 1 } md={ 1 } lg={ 2 } />
+              <Col xs={ 12 } sm={ 10 } md={ 10 } lg={ 8 }>
+              <h2>Cannot connect to Mattermost</h2>
+              <hr />
+              <p>We're having trouble connecting to Mattermost. If refreshing this page (Ctrl+R or Command+R) does not work please verify that:</p>
+              <br />
+              <ul style={ errorPage.bullets }>
+                <li>Your computer is connected to the internet.</li>
+                <li>The Mattermost URL
+                  { ' ' }
+                  <a href={ this.props.errorInfo.validatedURL }>
+                    { this.props.errorInfo.validatedURL }
+                  </a> is correct.</li>
+                <li>You can reach
+                  { ' ' }
+                  <a href={ this.props.errorInfo.validatedURL }>
+                    { this.props.errorInfo.validatedURL }
+                  </a> from a browser window.</li>
+              </ul>
+              <br />
+              <div style={ errorPage.techInfo }>
+                { this.props.errorInfo.errorDescription } (
+                { this.props.errorInfo.errorCode })</div>
+              </Col>
+              <Col xs={ 0 } sm={ 1 } md={ 1 } lg={ 2 } />
+            </Row>
+          </div>
+        </div>
       </Grid>
       );
   }
@@ -508,12 +595,6 @@ try {
 if (config.teams.length === 0) {
   window.location = 'settings.html';
 }
-
-var contextMenu = require('./menus/context');
-var menu = contextMenu.createDefault();
-window.addEventListener('contextmenu', function(e) {
-  menu.popup(remote.getCurrentWindow());
-}, false);
 
 var showUnreadBadgeWindows = function(unreadCount, mentionCount) {
   const badge = require('./js/badge');
