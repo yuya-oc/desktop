@@ -40,11 +40,19 @@
       "tar.gz"
     ]
   },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": true,
+    "allowToChangeInstallationDirectory": true,
+    "license": "LICENSE",
+    "artifactName": "${name}-setup-${version}-${os}.${ext}"
+  },
   "squirrelWindows": {
     "iconUrl": "https://raw.githubusercontent.com/mattermost/desktop/master/resources/icon.ico"
   },
   "win": {
     "target": [
+      "nsis",
       "squirrel",
       "zip"
     ]

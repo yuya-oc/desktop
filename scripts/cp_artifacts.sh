@@ -9,6 +9,7 @@ cp "${SRC}/Mattermost-${VERSION}-win.zip" "${DEST}/mattermost-desktop-${VERSION}
 cp "${SRC}/Mattermost-${VERSION}-ia32-win.zip" "${DEST}/mattermost-desktop-${VERSION}-win32.zip"
 cp "${SRC}/win/Mattermost Setup ${VERSION}.exe" "${DEST}/mattermost-setup-${VERSION}-win64.exe"
 cp "${SRC}/win-ia32/Mattermost Setup ${VERSION}-ia32.exe" "${DEST}/mattermost-setup-${VERSION}-win32.exe"
+cp "${SRC}/mattermost-setup-*.exe" "${DEST}/"
 
 cp "${SRC}/mac/Mattermost-${VERSION}-mac.tar.gz" "${DEST}/mattermost-desktop-${VERSION}-mac.tar.gz"
 
