@@ -7,12 +7,13 @@ const notification = require('../js/notification');
 
 Reflect.deleteProperty(global.Buffer); // http://electron.atom.io/docs/tutorial/security/#buffer-global
 
-function hasClass(element, className) {
-  var rclass = /[\t\r\n\f]/g;
-  if ((' ' + element.className + ' ').replace(rclass, ' ').indexOf(className) > -1) {
-    return true;
+function sumMentionBadges(rootElement, badgeClass) {
+  let mentionCount = 0;
+  const badgeElements = rootElement.getElementsByClassName(badgeClass);
+  for (const badge of badgeElements) {
+    mentionCount += parseInt(badge.innerHTML, 10);
   }
-  return false;
+  return mentionCount;
 }
 
 setInterval(function getUnreadCount() {
@@ -24,7 +25,8 @@ setInterval(function getUnreadCount() {
   }
 
   // LHS not found => Log out => Count should be 0.
-  if (document.getElementById('sidebar-left') === null) {
+  const sidebarLeft = document.getElementById('sidebar-left');
+  if (sidebarLeft === null) {
     ipc.sendToHost('onUnreadCountChange', 0, 0, false, false);
     this.unreadCount = 0;
     this.mentionCount = 0;
@@ -42,13 +44,8 @@ setInterval(function getUnreadCount() {
   }
 
   // mentionCount in sidebar
-  var elem = document.getElementsByClassName('badge');
-  var mentionCount = 0;
-  for (var i = 0; i < elem.length; i++) {
-    if (isElementVisible(elem[i]) && !hasClass(elem[i], 'badge-notify')) {
-      mentionCount += Number(elem[i].innerHTML);
-    }
-  }
+  // badge was changed to mention-badge. To keep compatibility, count both classes
+  const mentionCount = sumMentionBadges(sidebarLeft, 'badge') + sumMentionBadges(sidebarLeft, 'mention-badge');
 
   var postAttrName = 'data-reactid';
   var lastPostElem = document.querySelector('div[' + postAttrName + '="' + this.lastCheckedPostId + '"]');
