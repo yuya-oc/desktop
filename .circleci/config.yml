@@ -1,0 +1,40 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/mattermost-desktop
+    docker:
+      - image: electronuserland/electron-builder:wine
+    steps:
+      - checkout
+      - restore_cache:
+          key: npm-{{ .Branch }}-{{ checksum "package.json" }}
+      - restore_cache:
+          key: npm-{{ .Branch }}-{{ checksum "src/package.json" }}
+      - run: apt-get update && apt-get -y install jq
+      # - run: npm install
+      - run: yarn # instead of npm 5.0.3
+      - run: npm run build
+      - run: npm run package:windows
+      - run: npm run package:mac
+      - run: npm run package:linux
+      - run: mkdir -p /tmp/artifacts
+      - run: sh -x ./scripts/cp_artifacts.sh release /tmp/artifacts
+      - save_cache:
+          key: npm-{{ .Branch }}-{{ checksum "package.json" }}
+          paths:
+            - "node_modules"
+      - save_cache:
+          key: npm-{{ .Branch }}-{{ checksum "src/package.json" }}
+          paths:
+            - "src/node_modules"
+      - store_artifacts:
+          path: /tmp/artifacts/
+          destination: packages
+      - run:
+          name: Running X virtual framebuffer
+          command: Xvfb :99 -screen 0 1280x1024x24
+          background: true
+      - run: npm test
+      - store_artifacts:
+          path: test-results.xml
+          prefix: tests
