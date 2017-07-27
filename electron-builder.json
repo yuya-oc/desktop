@@ -1,4 +1,8 @@
 {
+  "publish": [{
+    "provider": "generic",
+    "url": "http://localhost:8081/"
+  }],
   "appId": "com.mattermost.desktop",
   "directories": {
     "buildResources": "resources",
@@ -50,7 +54,7 @@
   "mac": {
     "category": "public.app-category.productivity",
     "target": [
-      "tar.gz"
+      "zip"
     ],
     "extraResources": [
       {
@@ -66,7 +70,7 @@
   },
   "win": {
     "target": [
-      "squirrel",
+      "nsis",
       "zip"
     ],
     "extraFiles": [
