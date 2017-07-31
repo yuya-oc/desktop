@@ -14,10 +14,32 @@ const os = require('os');
 const path = require('path');
 const isDev = require('electron-is-dev');
 const installExtension = require('electron-devtools-installer');
+const {autoUpdater} = require('electron-updater');
 const squirrelStartup = require('./main/squirrelStartup');
 const CriticalErrorHandler = require('./main/CriticalErrorHandler');
-
 const protocols = require('../electron-builder.json').protocols;
+
+autoUpdater.on('error', (err) => {
+  console.log('autoUpdater.on error');
+  console.error(err);
+}).on('checking-for-update', () => {
+  console.log('checking-for-update');
+}).on('update-available', (info) => {
+  console.log('update-available');
+  console.log(info);
+}).on('update-not-available', (info) => {
+  console.log('update-not-available');
+  console.log(info);
+}).on('download-progress', (progress) => {
+  console.log('download-progress');
+  console.log(progress);
+}).on('update-downloaded', (info) => {
+  console.log('update-downloaded');
+  console.log(info);
+  setTimeout(() => {
+    autoUpdater.quitAndInstall();
+  }, 5000);
+});
 
 const criticalErrorHandler = new CriticalErrorHandler();
 
@@ -389,6 +411,8 @@ app.on('ready', () => {
     clearAppCache();
   }
   appState.lastAppVersion = app.getVersion();
+
+  autoUpdater.checkForUpdates();
 
   if (global.isDev) {
     installExtension.default(installExtension.REACT_DEVELOPER_TOOLS).
