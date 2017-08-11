@@ -15,9 +15,9 @@ const path = require('path');
 const isDev = require('electron-is-dev');
 const installExtension = require('electron-devtools-installer');
 const {autoUpdater} = require('electron-updater');
-const squirrelStartup = require('./main/squirrelStartup');
 const CriticalErrorHandler = require('./main/CriticalErrorHandler');
 const protocols = require('../electron-builder.json').protocols;
+const {upgradeAutoLaunch} = require('./main/autoLaunch');
 
 autoUpdater.on('error', (err) => {
   console.log('autoUpdater.on error');
@@ -48,9 +48,6 @@ process.on('uncaughtException', criticalErrorHandler.processUncaughtExceptionHan
 global.willAppQuit = false;
 
 app.setAppUserModelId('com.squirrel.mattermost.Mattermost'); // Use explicit AppUserModelID
-if (squirrelStartup()) {
-  global.willAppQuit = true;
-}
 
 var settings = require('./common/settings');
 var certificateStore = require('./main/certificateStore').load(path.resolve(app.getPath('userData'), 'certificate.json'));
@@ -388,6 +385,9 @@ app.on('open-url', (event, url) => {
 app.on('ready', () => {
   if (global.willAppQuit) {
     return;
+  }
+  if (!global.isDev) {
+    upgradeAutoLaunch();
   }
   autoUpdater.checkForUpdates();
   if (global.isDev) {
