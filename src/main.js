@@ -18,6 +18,7 @@ const {autoUpdater} = require('electron-updater');
 const CriticalErrorHandler = require('./main/CriticalErrorHandler');
 const protocols = require('../electron-builder.json').protocols;
 const {upgradeAutoLaunch} = require('./main/autoLaunch');
+const {createUpdaterWindow} = require('./main/autoUpdater');
 
 autoUpdater.on('error', (err) => {
   console.log('autoUpdater.on error');
@@ -67,6 +68,7 @@ const assetsDir = path.resolve(app.getAppPath(), 'assets');
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 var mainWindow = null;
+let updaterWindow;
 let spellChecker = null;
 let deeplinkingUrl = null;
 let scheme = null;
@@ -420,6 +422,21 @@ app.on('ready', () => {
       then((name) => console.log(`Added Extension:  ${name}`)).
       catch((err) => console.log('An error occurred: ', err));
   }
+
+  updaterWindow = createUpdaterWindow({linuxAppIcon: path.join(assetsDir, 'appicon.png'), nextVersion: '0.0.0'});
+  updaterWindow.
+  on('click-skip', () => {
+    console.log('click-skip');
+  }).
+  on('click-remind', () => {
+    console.log('click-remind');
+  }).
+  on('click-install', () => {
+    console.log('click-install');
+  }).
+  on('click-release-notes', () => {
+    console.log('click-release-notes');
+  });
 
   // Protocol handler for win32
   if (process.platform === 'win32') {
