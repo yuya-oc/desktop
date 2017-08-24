@@ -2,6 +2,31 @@
 
 const electron = require('electron');
 const Menu = electron.Menu;
+const zoomHelper = require('../../common/zoomHelper');
+
+function zoomInHelper(mainWindow, menuItem, browserWindow) {
+  if (browserWindow === mainWindow) {
+    mainWindow.webContents.send('zoom-in');
+  } else {
+    zoomHelper.zoomIn(browserWindow.webContents);
+  }
+}
+
+function zoomOutHelper(mainWindow, menuItem, browserWindow) {
+  if (browserWindow === mainWindow) {
+    mainWindow.webContents.send('zoom-out');
+  } else {
+    zoomHelper.zoomOut(browserWindow.webContents);
+  }
+}
+
+function resetZoomHelper(mainWindow, menuItem, browserWindow) {
+  if (browserWindow === mainWindow) {
+    mainWindow.webContents.send('reset-zoom');
+  } else {
+    zoomHelper.resetZoom(browserWindow.webContents);
+  }
+}
 
 function createTemplate(mainWindow, config, isDev) {
   const settingsURL = isDev ? 'http://localhost:8080/browser/settings.html' : `file://${electron.app.getAppPath()}/browser/settings.html`;
@@ -13,6 +38,10 @@ function createTemplate(mainWindow, config, isDev) {
   var appName = electron.app.getName();
   var firstMenuName = (process.platform === 'darwin') ? appName : 'File';
   var template = [];
+
+  const zoomIn = zoomInHelper.bind(null, mainWindow);
+  const zoomOut = zoomOutHelper.bind(null, mainWindow);
+  const resetZoom = resetZoomHelper.bind(null, mainWindow);
 
   const platformAppMenu = process.platform === 'darwin' ? [{
     label: 'About ' + appName,
@@ -114,21 +143,27 @@ function createTemplate(mainWindow, config, isDev) {
     }, {
       role: 'togglefullscreen'
     }, separatorItem, {
-      role: 'resetzoom'
+      label: 'Actual Size',
+      accelerator: 'CmdOrCtrl+0',
+      click: resetZoom
     }, {
-      role: 'zoomin'
+      label: 'Zoom In',
+      accelerator: 'CmdOrCtrl+Plus',
+      click: zoomIn
     }, {
       label: 'Zoom In (hidden)',
       accelerator: 'CmdOrCtrl+=',
       visible: false,
-      role: 'zoomin'
+      click: zoomIn
     }, {
-      role: 'zoomout'
+      label: 'Zoom Out',
+      accelerator: 'CmdOrCtrl+-',
+      click: zoomOut
     }, {
       label: 'Zoom Out (hidden)',
       accelerator: 'CmdOrCtrl+Shift+-',
       visible: false,
-      role: 'zoomout'
+      click: zoomOut
     }, separatorItem, {
       label: 'Toggle Developer Tools',
       accelerator: (() => {

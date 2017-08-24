@@ -70,6 +70,17 @@ const MainPage = createReactClass({
       this.refs[`mattermostView${this.state.key}`].clearCacheAndReload();
     });
 
+    // zoom the activated tab
+    ipcRenderer.on('zoom-in', () => {
+      this.refs[`mattermostView${this.state.key}`].zoomIn();
+    });
+    ipcRenderer.on('zoom-out', () => {
+      this.refs[`mattermostView${this.state.key}`].zoomOut();
+    });
+    ipcRenderer.on('reset-zoom', () => {
+      this.refs[`mattermostView${this.state.key}`].resetZoom();
+    });
+
     function focusListener() {
       self.handleOnTeamFocused(self.state.key);
       self.refs[`mattermostView${self.state.key}`].focusOnWebView();

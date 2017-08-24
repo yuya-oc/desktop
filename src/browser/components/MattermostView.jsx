@@ -5,6 +5,7 @@ const {findDOMNode} = require('react-dom');
 const {ipcRenderer, remote, shell} = require('electron');
 const url = require('url');
 const contextMenu = require('../js/contextMenu');
+const zoomHelper = require('../../common/zoomHelper');
 
 const ErrorView = require('./ErrorView.jsx');
 
@@ -195,6 +196,24 @@ const MattermostView = createReactClass({
   goForward() {
     const webview = findDOMNode(this.refs.webview);
     webview.getWebContents().goForward();
+  },
+
+  zoomIn() {
+    const webview = findDOMNode(this.refs.webview);
+    const webContents = webview.getWebContents();
+    zoomHelper.zoomIn(webContents);
+  },
+
+  zoomOut() {
+    const webview = findDOMNode(this.refs.webview);
+    const webContents = webview.getWebContents();
+    zoomHelper.zoomOut(webContents);
+  },
+
+  resetZoom() {
+    const webview = findDOMNode(this.refs.webview);
+    const webContents = webview.getWebContents();
+    zoomHelper.resetZoom(webContents);
   },
 
   render() {
