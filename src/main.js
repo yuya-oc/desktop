@@ -14,33 +14,10 @@ const os = require('os');
 const path = require('path');
 const isDev = require('electron-is-dev');
 const installExtension = require('electron-devtools-installer');
-const {autoUpdater} = require('electron-updater');
+const autoUpdater = require('./main/autoUpdater');
 const CriticalErrorHandler = require('./main/CriticalErrorHandler');
 const protocols = require('../electron-builder.json').protocols;
 const {upgradeAutoLaunch} = require('./main/autoLaunch');
-const {createUpdaterWindow} = require('./main/autoUpdater');
-
-autoUpdater.on('error', (err) => {
-  console.log('autoUpdater.on error');
-  console.error(err);
-}).on('checking-for-update', () => {
-  console.log('checking-for-update');
-}).on('update-available', (info) => {
-  console.log('update-available');
-  console.log(info);
-}).on('update-not-available', (info) => {
-  console.log('update-not-available');
-  console.log(info);
-}).on('download-progress', (progress) => {
-  console.log('download-progress');
-  console.log(progress);
-}).on('update-downloaded', (info) => {
-  console.log('update-downloaded');
-  console.log(info);
-  setTimeout(() => {
-    autoUpdater.quitAndInstall();
-  }, 5000);
-});
 
 const criticalErrorHandler = new CriticalErrorHandler();
 
@@ -58,6 +35,7 @@ const trayMenu = require('./main/menus/tray');
 const downloadURL = require('./main/downloadURL');
 const allowProtocolDialog = require('./main/allowProtocolDialog');
 const permissionRequestHandler = require('./main/permissionRequestHandler');
+const AppStateManager = require('./main/AppStateManager');
 
 const SpellChecker = require('./main/SpellChecker');
 
@@ -66,10 +44,10 @@ const assetsDir = path.resolve(app.getAppPath(), 'assets');
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 var mainWindow = null;
-let updaterWindow;
 let spellChecker = null;
 let deeplinkingUrl = null;
 let scheme = null;
+let appState = null;
 
 var argv = require('yargs').parse(process.argv.slice(1));
 
@@ -391,7 +369,8 @@ app.on('ready', () => {
   if (!global.isDev) {
     upgradeAutoLaunch();
   }
-  autoUpdater.checkForUpdates();
+  const appStateJson = path.join(app.getPath('userData'), 'app-state.json');
+  appState = new AppStateManager(appStateJson);
   if (global.isDev) {
     installExtension.default(installExtension.REACT_DEVELOPER_TOOLS).
       then((name) => console.log(`Added Extension:  ${name}`)).
@@ -624,6 +603,16 @@ app.on('ready', () => {
 
   const permissionFile = path.join(app.getPath('userData'), 'permission.json');
   session.defaultSession.setPermissionRequestHandler(permissionRequestHandler(mainWindow, permissionFile));
+
+  autoUpdater.initialize(appState, mainWindow);
+  ipcMain.on('check-for-updates', () => {
+    if (global.isDev) {
+      console.log('Development mode: Skip checking for updates');
+    } else {
+      autoUpdater.checkForUpdates();
+    }
+  });
+  ipcMain.emit('check-for-updates');
 
   // Open the DevTools.
   // mainWindow.openDevTools();
