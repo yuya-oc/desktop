@@ -1,10 +1,9 @@
 'use strict';
 
 const electron = require('electron');
+const {ipcMain, Menu} = electron;
 const settings = require('../../common/settings');
 const buildConfig = require('../../common/config/buildConfig');
-
-const Menu = electron.Menu;
 
 function createTemplate(mainWindow, config, isDev) {
   const settingsURL = isDev ? 'http://localhost:8080/browser/settings.html' : `file://${electron.app.getAppPath()}/browser/settings.html`;
@@ -221,6 +220,16 @@ function createTemplate(mainWindow, config, isDev) {
   submenu.push({
     label: `Version ${electron.app.getVersion()}`,
     enabled: false
+  }, {
+    type: 'separator'
+  }, {
+    label: `Version ${electron.app.getVersion()}`,
+    enabled: false
+  }, {
+    label: 'Check for Updates...',
+    click() {
+      ipcMain.emit('check-for-updates');
+    }
   });
   template.push({label: '&Help', submenu});
   return template;
