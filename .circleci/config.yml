@@ -30,11 +30,7 @@ jobs:
       - store_artifacts:
           path: /tmp/artifacts/
           destination: packages
-      - run:
-          name: Running X virtual framebuffer
-          command: Xvfb :99 -screen 0 1280x1024x24
-          background: true
-      - run: npm test
+      - run: xvfb-run npm test
       - store_artifacts:
           path: test-results.xml
           prefix: tests
