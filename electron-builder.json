@@ -4,6 +4,7 @@
     "url": "http://localhost:8081/"
   }],
   "appId": "com.mattermost.desktop",
+  "artifactName": "mattermost-desktop-${version}-${os}-${arch}.${ext}",
   "directories": {
     "buildResources": "resources",
     "app": "src",
@@ -68,5 +69,8 @@
       "zip",
       "nsis"
     ]
+  },
+  "nsis": {
+    "artifactName": "mattermost-setup-${version}.${ext}"
   }
 }
