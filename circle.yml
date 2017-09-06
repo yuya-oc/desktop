@@ -23,7 +23,7 @@ dependencies:
     - docker run --rm -it -v `pwd`:/project electronuserland/electron-builder:wine npm run package:windows
     - docker run --rm -it -v `pwd`:/project electronuserland/electron-builder:wine npm run package:mac
     - docker run --rm -it -v `pwd`:/project electronuserland/electron-builder:wine npm run package:linux
-    - sh -x ./scripts/cp_artifacts.sh release $CIRCLE_ARTIFACTS
+    - cd release && cp *.zip *.exe *.tar.gz *.deb *.yml *.json $CIRCLE_ARTIFACTS
 
 test:
   override:
