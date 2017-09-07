@@ -221,14 +221,9 @@ function createTemplate(mainWindow, config, isDev) {
     label: `Version ${electron.app.getVersion()}`,
     enabled: false
   }, {
-    type: 'separator'
-  }, {
-    label: `Version ${electron.app.getVersion()}`,
-    enabled: false
-  }, {
     label: 'Check for Updates...',
     click() {
-      ipcMain.emit('check-for-updates');
+      ipcMain.emit('check-for-updates', true);
     }
   });
   template.push({label: '&Help', submenu});
