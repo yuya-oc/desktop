@@ -11,7 +11,9 @@
     "showUnreadBadge": true,
     "useSpellChecker": true,
     "spellCheckerLocale": "en-US",
-    "helpLink": "https://docs.mattermost.com/help/apps/desktop-guide.html"
+    "helpLink": "https://docs.mattermost.com/help/apps/desktop-guide.html",
+    "enableMultiTeams": true,
+    "enableServerManagement": true
   },
   "1": {
     "teams": [],
@@ -25,6 +27,8 @@
     "showUnreadBadge": true,
     "useSpellChecker": true,
     "spellCheckerLocale": "en-US",
-    "helpLink": "https://docs.mattermost.com/help/apps/desktop-guide.html"
+    "helpLink": "https://docs.mattermost.com/help/apps/desktop-guide.html",
+    "enableMultiTeams": true,
+    "enableServerManagement": true
   }
 }
