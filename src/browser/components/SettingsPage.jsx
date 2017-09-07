@@ -399,7 +399,8 @@ const SettingsPage = createReactClass({
         </Checkbox>);
     }
 
-    if (process.platform === 'darwin' || process.platform === 'linux') {
+    var shouldShowDarwinTray = this.state.allowDarwinIconTray && process.platform === 'darwin';
+    if (process.platform === 'linux' || shouldShowDarwinTray) {
       options.push(
         <Checkbox
           key='inputShowTrayIcon'

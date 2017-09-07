@@ -13,7 +13,8 @@
     "spellCheckerLocale": "en-US",
     "helpLink": "https://docs.mattermost.com/help/apps/desktop-guide.html",
     "enableMultiTeams": true,
-    "enableServerManagement": true
+    "enableServerManagement": true,
+    "allowDarwinIconTray": true
   },
   "1": {
     "teams": [],
@@ -29,6 +30,7 @@
     "spellCheckerLocale": "en-US",
     "helpLink": "https://docs.mattermost.com/help/apps/desktop-guide.html",
     "enableMultiTeams": true,
-    "enableServerManagement": true
+    "enableServerManagement": true,
+    "allowDarwinIconTray": true
   }
 }
