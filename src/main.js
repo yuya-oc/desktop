@@ -604,7 +604,8 @@ app.on('ready', () => {
   const permissionFile = path.join(app.getPath('userData'), 'permission.json');
   session.defaultSession.setPermissionRequestHandler(permissionRequestHandler(mainWindow, permissionFile));
 
-  autoUpdater.initialize(appState, mainWindow);
+  const updaterConfig = autoUpdater.loadConfig(path.resolve(app.getAppPath(), '../app-updater-config.json'));
+  autoUpdater.initialize(appState, mainWindow, updaterConfig.isNotifyOnly());
   ipcMain.on('check-for-updates', autoUpdater.checkForUpdates);
   mainWindow.once('show', () => {
     if (autoUpdater.shouldCheckForUpdatesOnStart(appState.updateCheckedDate)) {
