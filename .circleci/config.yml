@@ -31,7 +31,7 @@ jobs:
       - store_artifacts:
           path: /tmp/artifacts/
           destination: packages
-      - run: xvfb-run npm test
+      - run: DBUS_SESSION_BUS_ADDRESS=/dev/null xvfb-run npm test
       - store_artifacts:
           path: test-results.xml
           prefix: tests
