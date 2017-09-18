@@ -5,6 +5,7 @@ const http = require('http');
 const path = require('path');
 
 const env = require('../../modules/environment');
+const utils = require('../../modules/utils');
 
 describe('browser/index.html', function desc() {
   this.timeout(10000);
@@ -35,7 +36,7 @@ describe('browser/index.html', function desc() {
   beforeEach(() => {
     fs.writeFileSync(env.configFilePath, JSON.stringify(config));
     this.app = env.getSpectronApp();
-    return this.app.start();
+    return utils.sleep(1000).then(() => this.app.start());
   });
 
   afterEach(() => {
