@@ -40,8 +40,11 @@ describe('browser/index.html', function desc() {
 
   afterEach(() => {
     if (this.app && this.app.isRunning()) {
-      return this.app.stop();
+      return this.app.stop().then(() => {
+        env.cleanTestConfig();
+      });
     }
+    env.cleanTestConfig();
     return true;
   });
 
