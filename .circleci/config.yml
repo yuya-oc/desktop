@@ -23,6 +23,7 @@ jobs:
           key: npm-{{ .Branch }}-{{ checksum "package.json" }}
           paths:
             - "node_modules"
+            - "~/.electron"
       - save_cache:
           key: npm-{{ .Branch }}-{{ checksum "src/package.json" }}
           paths:
