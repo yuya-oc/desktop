@@ -4,7 +4,7 @@ const fs = require('fs');
 
 const env = require('../modules/environment');
 
-describe('application', function desc() {
+describe.skip('application', function desc() {
   this.timeout(10000);
 
   beforeEach(() => {
