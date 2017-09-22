@@ -8,7 +8,7 @@ const env = require('../modules/environment');
 const utils = require('../modules/utils');
 
 describe('application', function desc() {
-  this.timeout(10000);
+  this.timeout(30000);
 
   const serverPort = 8181;
   const testURL = `http://localhost:${serverPort}`;
