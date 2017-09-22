@@ -4,6 +4,7 @@ jobs:
     working_directory: ~/mattermost-desktop
     docker:
       - image: electronuserland/electron-builder:wine
+    parallelism: 3
     steps:
       - checkout
       - restore_cache:
@@ -14,9 +15,12 @@ jobs:
       # - run: npm install
       - run: yarn # instead of npm 5.0.3
       - run: npm run build
-      - run: npm run package:windows
-      - run: npm run package:mac
-      - run: npm run package:linux
+      - run:
+          type: shell
+          command:
+            printf 'package:windows\npackage:mac\npackage:linux'
+              | circleci tests split
+              | xargs -n 1 npm run
       - run: mkdir -p /tmp/artifacts
       - run: sh -x ./scripts/cp_artifacts.sh release /tmp/artifacts
       - save_cache:
