@@ -12,9 +12,12 @@ const {remote, ipcRenderer} = require('electron');
 const MainPage = require('./components/MainPage.jsx');
 
 const AppConfig = require('./config/AppConfig.js');
+const buildConfig = require('../common/config/buildConfig');
+const settings = require('../common/settings');
 const url = require('url');
 
 const badge = require('./js/badge');
+const teams = settings.mergeDefaultTeams(AppConfig.data.teams);
 
 remote.getCurrentWindow().removeAllListeners('focus');
 
@@ -86,8 +89,9 @@ function showUnreadBadge(unreadCount, mentionCount) {
   }
 }
 
-function teamConfigChange(teams) {
-  AppConfig.set('teams', teams);
+function teamConfigChange(updatedTeams) {
+  AppConfig.set('teams', updatedTeams.slice(buildConfig.defaultTeams.length));
+  teams.splice(0, teams.length, ...updatedTeams);
   ipcRenderer.send('update-menu', AppConfig.data);
   ipcRenderer.send('update-config');
 }
@@ -104,7 +108,7 @@ const initialIndex = parsedURL.query.index ? parseInt(parsedURL.query.index, 10)
 
 ReactDOM.render(
   <MainPage
-    teams={AppConfig.data.teams}
+    teams={teams}
     initialIndex={initialIndex}
     onUnreadCountChange={showUnreadBadge}
     onTeamConfigChange={teamConfigChange}

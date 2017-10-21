@@ -8,6 +8,7 @@ const {ipcRenderer, remote} = require('electron');
 const AutoLaunch = require('auto-launch');
 const {debounce} = require('underscore');
 
+const buildConfig = require('../../common/config/buildConfig');
 const settings = require('../../common/settings');
 
 const TeamList = require('./TeamList.jsx');
@@ -250,7 +251,9 @@ const SettingsPage = createReactClass({
             onTeamsChange={this.handleTeamsChange}
             updateTeam={this.updateTeam}
             addServer={this.addServer}
-            onTeamClick={backToIndex}
+            onTeamClick={(index) => {
+              backToIndex(index + buildConfig.defaultTeams.length);
+            }}
           />
         </Col>
       </Row>
