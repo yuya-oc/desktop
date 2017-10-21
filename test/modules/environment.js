@@ -38,6 +38,12 @@ module.exports = {
     });
   },
 
+  createTestUserDataDir() {
+    if (!fs.existsSync(userDataDir)) {
+      fs.mkdirSync(userDataDir);
+    }
+  },
+
   getSpectronApp() {
     return new Application({
       path: electronBinaryPath,
