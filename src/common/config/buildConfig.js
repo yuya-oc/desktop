@@ -7,11 +7,15 @@
  *                           If null is specified, the menu disappears.
  */
 const buildConfig = {
-  defaultTeams: [/*
+  defaultTeams: [
     {
       name: 'example',
       url: 'https://example.com'
-    }*/
+    },
+    {
+      name: 'google',
+      url: 'https://www.google.com'
+    }
   ],
   helpLink: 'https://docs.mattermost.com/help/apps/desktop-guide.html'
 };
