@@ -3,8 +3,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/node:6.11.2
-      - image: circleci/node:6.11.2-browsers
+      - image: circleci/node:6.11.2-stretch-browsers
 
     working_directory: ~/repo
 
