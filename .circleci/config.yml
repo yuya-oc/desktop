@@ -19,7 +19,7 @@ jobs:
             sudo dpkg --add-architecture i386
             sudo apt-get update
             sudo apt-get install --no-install-recommends -y --force-yes icnsutils graphicsmagick xz-utils jq wine-stable mono-devel ca-certificates-mono gcc-multilib g++-multilib
-            unset DISPLAY && wineboot --init
+            unset DISPLAY && wine winecfg --init
 
       # Download and cache dependencies
       - restore_cache:
