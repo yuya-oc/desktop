@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/node:6.11.3-stretch-browsers
+      - image: circleci/node:6.11.3
         environment:
           CHROME_BIN: "/usr/bin/google-chrome"
 
@@ -11,18 +11,18 @@ jobs:
     steps:
       - checkout
 
-      # - run:
-      #     name: Install base dependencies
-      #     command: |
-      #       sudo apt-get update
-      #       sudo apt-get install -y software-properties-common apt-transport-https
-      #       echo deb https://dl.winehq.org/wine-builds/debian/ jessie main | sudo tee /etc/apt/sources.list.d/winehq.list
-      #       sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
-      #       echo "deb http://download.mono-project.com/repo/debian jessie main" | sudo tee /etc/apt/sources.list.d/mono-xamarin.list
-      #       sudo dpkg --add-architecture i386
-      #       sudo apt-get update
-      #       sudo apt-get install --no-install-recommends -y --force-yes icnsutils graphicsmagick xz-utils jq winehq-stable mono-devel ca-certificates-mono gcc-multilib g++-multilib
-      #       unset DISPLAY && wine winecfg --init
+      - run:
+          name: Install base dependencies
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y software-properties-common apt-transport-https
+            echo deb https://dl.winehq.org/wine-builds/debian/ jessie main | sudo tee /etc/apt/sources.list.d/winehq.list
+            sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+            echo "deb http://download.mono-project.com/repo/debian jessie main" | sudo tee /etc/apt/sources.list.d/mono-xamarin.list
+            sudo dpkg --add-architecture i386
+            sudo apt-get update
+            sudo apt-get install --no-install-recommends -y --force-yes icnsutils graphicsmagick xz-utils jq winehq-stable mono-devel ca-certificates-mono gcc-multilib g++-multilib
+            unset DISPLAY && wine winecfg --init
 
       # Download and cache dependencies
       - restore_cache:
@@ -40,17 +40,17 @@ jobs:
           name: npm run build
           command: 'npm run build'
 
-      # - run:
-      #     name: Package Windows
-      #     command: 'npm run package:windows'
+      - run:
+          name: Package Windows
+          command: 'npm run package:windows'
 
-      # - run:
-      #     name: Package Mac
-      #     command: 'npm run package:mac'
+      - run:
+          name: Package Mac
+          command: 'npm run package:mac'
 
-      # - run:
-      #     name: Package Linux
-      #     command: 'npm run package:linux'
+      - run:
+          name: Package Linux
+          command: 'npm run package:linux'
 
       - save_cache:
           paths:
@@ -59,10 +59,19 @@ jobs:
             - ~/.cache/yarn
           key: cache-yarn-{{ checksum "yarn.lock" }}
 
-      - run: yarn test
+  test:
+    docker:
+      - image: circleci/node:6.11.3-browsers
+        environment:
+          CHROME_BIN: "/usr/bin/google-chrome"
 
+    working_directory: ~/desktop
+    steps:
+      - checkout
+      - run:
+        name: yarn install
+        command: 'yarn'
+      - run: yarn test
       - store_artifacts:
           path: test-results.xml
           prefix: tests
-
-
