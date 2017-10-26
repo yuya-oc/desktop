@@ -25,6 +25,18 @@ jobs:
           name: npm run build
           command: 'npm run build'
 
+      - run:
+          name: Package Windows
+          command: 'npm run package:windows'
+
+      - run:
+          name: Package Mac
+          command: 'npm run package:mac'
+
+      - run:
+          name: Package Linux
+          command: 'npm run package:linux'
+
       - save_cache:
           paths:
             - "src/node_modules"
