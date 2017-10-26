@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build:
+  package:
     docker:
       - image: circleci/node:6.11.3
         environment:
@@ -67,7 +67,7 @@ jobs:
 
     working_directory: ~/desktop
     steps:
-      - checkout
+      - checkout  
       - run:
         name: yarn install
         command: 'yarn'
