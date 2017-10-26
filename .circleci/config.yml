@@ -44,17 +44,17 @@ jobs:
           name: Package Windows
           command: 'npm run package:windows'
 
-      - run:
-          name: Package Mac
-          command: 'npm run package:mac'
+      # - run:
+      #     name: Package Mac
+      #     command: 'npm run package:mac'
 
-      - run:
-          name: Package Linux
-          command: 'npm run package:linux'
+      # - run:
+      #     name: Package Linux
+      #     command: 'npm run package:linux'
 
       - run:
           type: shell
-          command: export VERSION=`cat package.json | jq -r '.version'
+          command: export VERSION=`cat package.json | jq -r '.version'`
 
       - save_cache:
           paths:
