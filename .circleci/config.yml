@@ -54,7 +54,7 @@ jobs:
 
       - run:
           name: Set artifacts
-          command: "sh -x ./scripts/mv_artifacts.sh"
+          command: "sh -x ./scripts/mv_artifacts.sh release"
 
       - save_cache:
           paths:
