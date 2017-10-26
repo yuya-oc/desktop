@@ -44,13 +44,13 @@ jobs:
           name: Package Windows
           command: 'npm run package:windows'
 
-      # - run:
-      #     name: Package Mac
-      #     command: 'npm run package:mac'
+      - run:
+          name: Package Mac
+          command: 'npm run package:mac'
 
-      # - run:
-      #     name: Package Linux
-      #     command: 'npm run package:linux'
+      - run:
+          name: Package Linux
+          command: 'npm run package:linux'
 
       - run:
           name: Set artifacts
