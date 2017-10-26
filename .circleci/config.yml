@@ -18,7 +18,7 @@ jobs:
             echo "deb http://download.mono-project.com/repo/debian jessie main" | sudo tee /etc/apt/sources.list.d/mono-xamarin.list
             sudo dpkg --add-architecture i386
             sudo apt-get update
-            sudo apt-get install --no-install-recommends -y --force-yes icnsutils graphicsmagick xz-utils jq wine-stable mono-devel ca-certificates-mono gcc-multilib g++-multilib
+            sudo apt-get install --no-install-recommends -y --force-yes icnsutils graphicsmagick xz-utils jq wine wine-stable mono-devel ca-certificates-mono gcc-multilib g++-multilib
             unset DISPLAY && wine winecfg --init
 
       # Download and cache dependencies
