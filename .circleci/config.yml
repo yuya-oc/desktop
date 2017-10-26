@@ -19,6 +19,9 @@ jobs:
           name: update-npm
           command: 'sudo npm install -g npm@latest'
       - run:
+          name: yarn install
+          command: 'yarn install'
+      - run:
           name: Pre Checks
           command: |
             if git status --short | grep yarn\.lock; then echo 'yarn.lock is not updated'; false; else true; fi
