@@ -1,0 +1,51 @@
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:6.11.2
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+          - desktop-cache-{{ checksum "package.json" }}
+          - cache-yarn
+
+      - run:
+          name: Pre Checks
+          command: |
+            if git status --short | grep yarn\.lock; then echo 'yarn.lock is not updated'; false; else true; fi
+            sudo dpkg --add-architecture i386
+            sudo add-apt-repository ppa:ubuntu-wine/ppa -y
+            sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+            echo "deb http://download.mono-project.com/repo/debian wheezy main" | sudo tee /etc/apt/sources.list.d/     mono-xamarin.list
+            sudo apt-get update
+            sudo apt-get install --no-install-recommends -y icnsutils graphicsmagick xz-utils jq
+                wine1.8 mono-devel ca-certificates-mono
+                gcc-multilib g++-multilib
+            unset DISPLAY && wineboot --init
+            npm run build
+            npm run package:windows
+            npm run package:mac
+            npm run package:linux
+            sh -x ./scripts/cp_artifacts.sh release $CIRCLE_ARTIFACTS
+
+      - save_cache:
+          paths:
+            - "src/node_modules"
+          key: desktop-dependencies-{{ checksum "package.json" }}
+            - ~/.cache/yarn
+          key: cache-yarn-{{ checksum "package.json" }}
+
+      - run: yarn test
+
+      - store_artifacts:
+          path: test-results.xml
+          prefix: tests
+
+
