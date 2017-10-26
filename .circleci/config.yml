@@ -20,7 +20,7 @@ jobs:
           command: 'sudo npm install -g npm@latest'
       - run:
           name: yarn install
-          command: 'yarn install'
+          command: 'yarn'
       - run:
           name: Pre Checks
           command: |
