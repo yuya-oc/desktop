@@ -53,8 +53,8 @@ jobs:
       #     command: 'npm run package:linux'
 
       - run:
-          type: shell
-          command: export VERSION=`cat package.json | jq -r '.version'`
+          name: Set artifacts
+          command: "sh -x ./scripts/mv_artifacts.sh"
 
       - save_cache:
           paths:
@@ -64,8 +64,7 @@ jobs:
           key: cache-yarn-{{ checksum "yarn.lock" }}
 
       - store_artifacts:
-          path: "release/Mattermost-${VERSION}-win.zip"
-          destination: "mattermost-desktop-${VERSION}-win64.zip"
+          path: release/circleci/
 
   test:
     docker:
