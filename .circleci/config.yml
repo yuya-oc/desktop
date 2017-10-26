@@ -22,11 +22,9 @@ jobs:
           name: Pre Checks
           command: |
             if git status --short | grep yarn\.lock; then echo 'yarn.lock is not updated'; false; else true; fi
-            npm run build
-            npm run package:windows
-            npm run package:mac
-            npm run package:linux
-            sh -x ./scripts/cp_artifacts.sh release $CIRCLE_ARTIFACTS
+      - run:
+          name: npm run build
+          command: 'npm run build'
 
       - save_cache:
           paths:
