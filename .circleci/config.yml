@@ -69,9 +69,11 @@ jobs:
     steps:
       - checkout
       - run:
-        name: yarn install
-        command: 'yarn'
+          name: yarn install
+          command: 'yarn'
+
       - run: yarn test
+
       - store_artifacts:
           path: test-results.xml
           prefix: tests
