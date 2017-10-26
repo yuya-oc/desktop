@@ -15,9 +15,6 @@ jobs:
           - desktop-cache-{{ checksum "package.json" }}
           - cache-yarn
       - run:
-          name: update-npm
-          command: 'sudo npm install -g npm@latest'
-      - run:
           name: yarn install
           command: 'yarn'
       - run:
