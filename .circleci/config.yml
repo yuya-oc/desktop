@@ -68,6 +68,11 @@ jobs:
     working_directory: ~/desktop
     steps:
       - checkout
+      - restore_cache:
+          keys:
+          - desktop-cache-{{ checksum "package.json" }}
+          - cache-yarn-{{ checksum "yarn.lock" }}
+
       - run:
           name: yarn install
           command: 'yarn'
@@ -82,7 +87,7 @@ workflows:
   version: 2
   build_and_test:
     jobs:
-      - test
       - build
+      - test
         requires:
-            - test
+            - build
