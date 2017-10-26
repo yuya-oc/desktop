@@ -2,10 +2,9 @@ version: 2
 jobs:
   build:
     docker:
-      # specify the version you desire here
       - image: circleci/node:6.11.3
 
-    working_directory: ~/repo
+    working_directory: ~/desktop
 
     steps:
       - checkout
