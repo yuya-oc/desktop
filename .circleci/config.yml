@@ -3,6 +3,9 @@ jobs:
   build:
     docker:
       - image: circleci/node:6.11.3
+      - image: circleci/node:6.11.3-browsers
+        environment:
+          CHROME_BIN: "/usr/bin/google-chrome"
 
     working_directory: ~/desktop
 
@@ -25,7 +28,7 @@ jobs:
       - restore_cache:
           keys:
           - desktop-cache-{{ checksum "package.json" }}
-          - cache-yarn
+          - cache-yarn-{{ checksum "yarn.lock" }}
       - run:
           name: yarn install
           command: 'yarn'
@@ -54,7 +57,7 @@ jobs:
             - "src/node_modules"
           key: desktop-dependencies-{{ checksum "package.json" }}
             - ~/.cache/yarn
-          key: cache-yarn-{{ checksum "package.json" }}
+          key: cache-yarn-{{ checksum "yarn.lock" }}
 
       - run: yarn test
 
