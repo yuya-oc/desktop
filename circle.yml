@@ -28,6 +28,7 @@ dependencies:
     - npm run package:mac
     - npm run package:linux
     - sh -x ./scripts/cp_artifacts.sh release $CIRCLE_ARTIFACTS
+    - cp ~/*.txt $CIRCLE_ARTIFACTS
 
 test:
   override:
