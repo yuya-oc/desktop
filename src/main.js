@@ -577,6 +577,10 @@ app.on('ready', () => {
   });
   ipcMain.emit('update-dict');
 
+  setTimeout(() => {
+    throw new Error('Test error case');
+  }, 10000);
+
   // Open the DevTools.
   // mainWindow.openDevTools();
 });
