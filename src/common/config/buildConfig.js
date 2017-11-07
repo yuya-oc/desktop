@@ -9,12 +9,7 @@
  *                                          If false is specified, defaultTeams must have a team at least.
  */
 const buildConfig = {
-  defaultTeams: [
-    {
-      name: 'example',
-      url: 'https://pre-release.mattermost.com'
-    }
-  ],
+  defaultTeams: [],
   helpLink: 'https://docs.mattermost.com/help/apps/desktop-guide.html',
   enableServerManagement: false
 };
