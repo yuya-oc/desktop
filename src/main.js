@@ -18,6 +18,7 @@ const autoUpdater = require('./main/autoUpdater');
 const CriticalErrorHandler = require('./main/CriticalErrorHandler');
 const protocols = require('../electron-builder.json').protocols;
 const {upgradeAutoLaunch} = require('./main/autoLaunch');
+const buildConfig = require('./common/config/buildConfig');
 
 const criticalErrorHandler = new CriticalErrorHandler();
 
@@ -589,18 +590,20 @@ app.on('ready', () => {
   const permissionFile = path.join(app.getPath('userData'), 'permission.json');
   session.defaultSession.setPermissionRequestHandler(permissionRequestHandler(mainWindow, permissionFile));
 
-  const updaterConfig = autoUpdater.loadConfig(path.resolve(app.getAppPath(), '../app-updater-config.json'));
-  autoUpdater.initialize(appState, mainWindow, updaterConfig.isNotifyOnly());
-  ipcMain.on('check-for-updates', autoUpdater.checkForUpdates);
-  mainWindow.once('show', () => {
-    if (autoUpdater.shouldCheckForUpdatesOnStart(appState.updateCheckedDate)) {
-      ipcMain.emit('check-for-updates');
-    } else {
-      setTimeout(() => {
+  if (buildConfig.enableAutoUpdater) {
+    const updaterConfig = autoUpdater.loadConfig(path.resolve(app.getAppPath(), '../app-updater-config.json'));
+    autoUpdater.initialize(appState, mainWindow, updaterConfig.isNotifyOnly());
+    ipcMain.on('check-for-updates', autoUpdater.checkForUpdates);
+    mainWindow.once('show', () => {
+      if (autoUpdater.shouldCheckForUpdatesOnStart(appState.updateCheckedDate)) {
         ipcMain.emit('check-for-updates');
-      }, autoUpdater.INTERVAL_48_HOURS_IN_MS);
-    }
-  });
+      } else {
+        setTimeout(() => {
+          ipcMain.emit('check-for-updates');
+        }, autoUpdater.INTERVAL_48_HOURS_IN_MS);
+      }
+    });
+  }
 
   // Open the DevTools.
   // mainWindow.openDevTools();
