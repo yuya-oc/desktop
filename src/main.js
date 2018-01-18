@@ -10,6 +10,11 @@ const {
   systemPreferences,
   session
 } = require('electron');
+const fs = require('fs');
+const TMP_LOG = '/tmp/mattermost-desktop.log';
+if (fs.existsSync(TMP_LOG)) {
+  fs.truncateSync(TMP_LOG);
+}
 const os = require('os');
 const path = require('path');
 const isDev = require('electron-is-dev');
@@ -357,8 +362,11 @@ function setDeeplinkingUrl(url) {
 }
 
 app.on('will-finish-launching', () => {
+  fs.writeFileSync(TMP_LOG, 'will-finish-launching\n', {flag: 'a'});
+
   // Protocol handler for osx
   app.on('open-url', (event, url) => {
+    fs.writeFileSync(TMP_LOG, `open-url: ${url}\n`, {flag: 'a'});
     event.preventDefault();
     setDeeplinkingUrl(url);
     if (app.isReady()) {
@@ -378,6 +386,7 @@ app.on('will-finish-launching', () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on('ready', () => {
+  fs.writeFileSync(TMP_LOG, 'ready\n', {flag: 'a'});
   if (global.willAppQuit) {
     return;
   }
