@@ -369,16 +369,24 @@ app.on('will-finish-launching', () => {
     fs.writeFileSync(TMP_LOG, `open-url: ${url}\n`, {flag: 'a'});
     event.preventDefault();
     setDeeplinkingUrl(url);
+    fs.writeFileSync(TMP_LOG, `open-url: mainWindow: ${mainWindow !== null}\n`, {flag: 'a'});
+
     if (app.isReady()) {
+      fs.writeFileSync(TMP_LOG, 'app is ready\n', {flag: 'a'});
       function openDeepLink() {
         try {
+          fs.writeFileSync(TMP_LOG, `mainWindow.webContents.send ${deeplinkingUrl}\n`, {flag: 'a'});
           mainWindow.webContents.send('protocol-deeplink', deeplinkingUrl);
+          fs.writeFileSync(TMP_LOG, 'mainWindow.show\n', {flag: 'a'});
           mainWindow.show();
         } catch (err) {
+          fs.writeFileSync(TMP_LOG, `err ${err}\n`, {flag: 'a'});
           setTimeout(openDeepLink, 1000);
         }
       }
       openDeepLink();
+    } else {
+      fs.writeFileSync(TMP_LOG, 'app is NOT ready\n', {flag: 'a'});
     }
   });
 });
