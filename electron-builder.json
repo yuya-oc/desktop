@@ -1,7 +1,7 @@
 {
   "publish": [{
     "provider": "generic",
-    "url": "http://localhost:8081/"
+    "url": "https://557-67276967-gh.circle-artifacts.com/0/tmp/circle-artifacts.bo9Rl3N/"
   }],
   "appId": "com.mattermost.desktop",
   "artifactName": "mattermost-desktop-${version}-${os}-${arch}.${ext}",
