@@ -89,6 +89,7 @@ describe('browser/settings.html', function desc() {
       env.addClientCommands(this.app.client);
       return this.app.client.
       loadSettingsPage().
+      waitForVisible('h4=example_1').
       click('h4=example_1').
       pause(500).
       waitUntilWindowLoaded().
@@ -97,6 +98,7 @@ describe('browser/settings.html', function desc() {
       isVisible('#mattermostView1').then((visible) => visible.should.be.false).
 
       loadSettingsPage().
+      waitForVisible('h4=example_2').
       click('h4=example_2').
       pause(500).
       waitUntilWindowLoaded().
