@@ -4,10 +4,16 @@ const electron = require('electron');
 const ipc = electron.ipcRenderer;
 const webFrame = electron.webFrame;
 const EnhancedNotification = require('../js/notification');
+const BalloonNotification = require('../js/BalloonNotification');
+const osVersion = require('../../common/osVersion');
 
 const UNREAD_COUNT_INTERVAL = 1000;
 
-Notification = EnhancedNotification; // eslint-disable-line no-global-assign, no-native-reassign
+if (process.platform === 'win32' && osVersion.isLowerThanOrEqualWindows8_1()) {
+  Notification = BalloonNotification; // eslint-disable-line no-global-assign, no-native-reassign
+} else {
+  Notification = EnhancedNotification; // eslint-disable-line no-global-assign, no-native-reassign
+}
 
 Reflect.deleteProperty(global.Buffer); // http://electron.atom.io/docs/tutorial/security/#buffer-global
 
