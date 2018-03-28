@@ -10,7 +10,7 @@ const url = require('url');
 
 const React = require('react');
 const ReactDOM = require('react-dom');
-const {remote, ipcRenderer} = require('electron');
+const {remote, ipcRenderer, webFrame} = require('electron');
 
 const buildConfig = require('../common/config/buildConfig');
 const settings = require('../common/settings');
@@ -181,3 +181,18 @@ ReactDOM.render(
 // Drag&drop is allowed in webview of index.html.
 document.addEventListener('dragover', (event) => event.preventDefault());
 document.addEventListener('drop', (event) => event.preventDefault());
+
+function printLog(arg) {
+  console.log(`[main window] ${arg}`);
+}
+
+function printMemoryUsage() {
+  printLog(`[${(new Date()).toISOString()}] Printing memory usage:`);
+  printLog('Process Memory Info:');
+  printLog(JSON.stringify(process.getProcessMemoryInfo(), null, 2));
+  printLog('WebFrame Resource Usage:');
+  printLog(JSON.stringify(webFrame.getResourceUsage(), null, 2));
+}
+
+setInterval(printMemoryUsage, 60 * 60 * 1000); // 1hour
+printMemoryUsage();

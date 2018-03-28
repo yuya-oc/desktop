@@ -192,5 +192,18 @@ ipc.on('set-spellcheker', setSpellChecker);
 // We needed to manually clear cache to free memory in long-term-use.
 // http://seenaburns.com/debugging-electron-memory-usage/
 setInterval(() => {
+  console.log(`[${(new Date()).toISOString()}] Clearing webFrame caches`);
   webFrame.clearCache();
+  console.log(`[${(new Date()).toISOString()}] Done`);
 }, CLEAR_CACHE_INTERVAL);
+
+function printMemoryUsage() {
+  console.log(`[${(new Date()).toISOString()}] Printing memory usage:`);
+  console.log('Process Memory Info:');
+  console.log(JSON.stringify(process.getProcessMemoryInfo(), null, 2));
+  console.log('WebFrame Resource Usage:');
+  console.log(JSON.stringify(webFrame.getResourceUsage(), null, 2));
+}
+
+setInterval(printMemoryUsage, 60 * 60 * 1000); // 1hour
+printMemoryUsage();

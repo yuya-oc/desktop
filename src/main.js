@@ -626,4 +626,12 @@ app.on('ready', () => {
 
   // Open the DevTools.
   // mainWindow.openDevTools();
+  setInterval(printMemoryUsage, 60 * 60 * 1000); // 1 hour
+  printMemoryUsage();
 });
+
+function printMemoryUsage() {
+  console.log(`[${(new Date()).toISOString()}] Printing memory usage:`);
+  console.log('Process Memory Info:');
+  console.log(JSON.stringify(process.getProcessMemoryInfo(), null, 2));
+}
