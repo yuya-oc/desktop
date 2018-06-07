@@ -440,8 +440,8 @@ app.on('ready', () => {
   });
   criticalErrorHandler.setMainWindow(mainWindow);
   mainWindow.on('unresponsive', criticalErrorHandler.windowUnresponsiveHandler.bind(criticalErrorHandler));
-  mainWindow.webContents.on('crashed', () => {
-    throw new Error('webContents \'crashed\' event has been emitted');
+  mainWindow.webContents.on('crashed', (event, killed) => {
+    console.log(`The mainWindow.webContents emitted 'crashed' event (killed = ${killed})`);
   });
 
   ipcMain.on('notified', () => {
