@@ -4,21 +4,24 @@
 
 import React from 'react';
 import propTypes from 'prop-types';
-import {Window as ReactDesktopWindow, TitleBar} from 'react-desktop/windows';
+import {Window as ReactDesktopWindow} from 'react-desktop/windows';
+
+import TitleBar from './TitleBar';
 
 const Window = (props) => {
   if (props.platform === 'win32') {
     return (
       <ReactDesktopWindow
+        className='Window'
         chrome={true}
         color={props.color}
         theme={props.theme}
       >
         <TitleBar
-          background={true}
           controls={props.controls}
           color={props.color}
           isMaximized={props.isMaximized}
+          theme={props.theme}
           title={props.title}
           onCloseClick={props.onCloseClick}
           onMaximizeClick={props.onMaximizeClick}

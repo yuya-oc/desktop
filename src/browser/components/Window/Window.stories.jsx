@@ -6,6 +6,8 @@ import {storiesOf} from '@storybook/react';
 import {action} from '@storybook/addon-actions';
 
 import Window from './Window.jsx';
+import '../../css/components/Window.css';
+import '../../css/components/TitleBar.css';
 
 storiesOf('Window', module).
 
