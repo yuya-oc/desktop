@@ -1,0 +1,24 @@
+.TitleBar {
+  display: flex;
+  height: 31px;
+}
+
+.TitleBar_focused .TitleBar-MenuButton {
+  color: #000000;
+}
+
+.TitleBar_unfocused .TitleBar-MenuButton {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.TitleBar .TitleBar-MenuButton:hover {
+  background-color:  rgb(229, 229, 229) !important;
+}
+
+.TitleBar .TitleBar-DarkMenuButton {
+  color: #ffffff;
+}
+
+.TitleBar .TitleBar-DarkMenuButton:hover>div {
+  background-color:  rgba(255, 255, 255, 0.13);
+}
