@@ -20,6 +20,7 @@ storiesOf('Window', module).
       onCloseClick={action('clicked close')}
       onMinimizeClick={action('clicked minimize')}
       onMaximizeClick={action('clicked maximize')}
+      onMenuClick={action('clicked menu')}
     >
       <p>{'Hello Storybook.'}</p>
     </Window>

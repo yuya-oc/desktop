@@ -53,6 +53,7 @@ class TitleBar extends React.Component {
           background={true}
           color={this.props.color}
           theme={this.props.theme}
+          onClick={this.props.onMenuClick}
         >
           <View
             height={31}
@@ -88,6 +89,7 @@ TitleBar.propTypes = {
   onMaximizeClick: propTypes.func,
   onMinimizeClick: propTypes.func,
   onRestoreDownClick: propTypes.func,
+  onMenuClick: propTypes.func,
   title: propTypes.string,
   theme: propTypes.oneOf(['light', 'dark']),
 };

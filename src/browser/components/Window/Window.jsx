@@ -27,6 +27,7 @@ const Window = (props) => {
           onMaximizeClick={props.onMaximizeClick}
           onMinimizeClick={props.onMinimizeClick}
           onRestoreDownClick={props.onRestoreDownClick}
+          onMenuClick={props.onMenuClick}
         />
         {props.children}
       </ReactDesktopWindow>
@@ -51,6 +52,7 @@ Window.propTypes = {
   onMaximizeClick: propTypes.func,
   onMinimizeClick: propTypes.func,
   onRestoreDownClick: propTypes.func,
+  onMenuClick: propTypes.func,
 };
 
 export default Window;
