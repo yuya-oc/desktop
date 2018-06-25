@@ -1,0 +1,43 @@
+li.Tab>a {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 2px 2px 0 0;
+  border: 1px solid #ddd;
+  color: #888;
+  height: 31px;
+  line-height: 29px;
+  margin-right: -1px;
+  margin-top: 0px;
+  padding: 0 15px;
+}
+
+.Tab:not(.active):not(.TabBar-AddButton) a:hover {
+  background-color: #e6e6e6;
+  border: 1px solid #ddd;
+  transition: background-color 0.2s ease;
+}
+
+.Tab .Tab-Label {
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 170px;
+}
+
+.Tab .Tab-UnreadLabel {
+  font-weight: bold;
+}
+
+.Tab .Tab-Badge {
+  background: #FF1744;
+  float: right;
+  color: white;
+  min-width: 19px;
+  font-size: 12px;
+  text-align: center;
+  line-height: 20px;
+  height: 19px;
+  margin-left: 5px;
+  margin-top: 5px;
+  border-radius: 50%;
+}
