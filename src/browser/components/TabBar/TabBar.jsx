@@ -8,8 +8,8 @@ import {Nav, NavItem, Glyphicon} from 'react-bootstrap';
 const EVENT_KEY_ADD_BUTTON = 'TabBar-AddServerButton';
 
 class TabBar extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
     this.handleSelect = this.handleSelect.bind(this);
   }
 

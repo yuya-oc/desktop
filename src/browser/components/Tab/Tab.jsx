@@ -36,7 +36,7 @@ const Tab = (props) => {
 Tab.propTypes = {
   eventKey: propTypes.any,
   label: propTypes.string,
-  unreadCount: propTypes.bool,
+  unreadCount: propTypes.number,
   mentionCount: propTypes.number,
 };
 
