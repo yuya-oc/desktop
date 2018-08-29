@@ -42,6 +42,11 @@ export default class EnhancedNotification extends OriginalNotification {
     }
   }
 
+  close() {
+    // A blank function to ignore notification.close() from webapp
+    // in order to keep notifications on notification center.
+  }
+
   set onclick(handler) {
     super.onclick = () => {
       const currentWindow = remote.getCurrentWindow();
