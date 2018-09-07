@@ -31,7 +31,6 @@ export default class MainPage extends React.Component {
       unreadAtActive: new Array(this.props.teams.length),
       mentionAtActiveCounts: new Array(this.props.teams.length),
       loginQueue: [],
-      targetURL: '',
     };
 
     this.activateFinder = this.activateFinder.bind(this);
@@ -242,10 +241,10 @@ export default class MainPage extends React.Component {
     if (targetURL === '') {
       // set delay to avoid momentary disappearance when hovering over multiple links
       this.targetURLDisappearTimeout = setTimeout(() => {
-        this.setState({targetURL: ''});
+        this.props.onTargetURLChange(targetURL);
       }, 500);
     } else {
-      this.setState({targetURL});
+      this.props.onTargetURLChange(targetURL);
     }
   }
 
@@ -404,7 +403,7 @@ export default class MainPage extends React.Component {
           ) : null}
         </Grid>
         <TransitionGroup>
-          { (this.state.targetURL === '') ?
+          { (this.props.targetURL === '') ?
             null :
             <CSSTransition
               classNames='hovering'
@@ -412,7 +411,7 @@ export default class MainPage extends React.Component {
             >
               <HoveringURL
                 key='hoveringURL'
-                targetURL={this.state.targetURL}
+                targetURL={this.props.targetURL}
               />
             </CSSTransition>
           }
@@ -437,6 +436,8 @@ MainPage.propTypes = {
   showAddServerButton: PropTypes.bool.isRequired,
   requestingPermission: TabBar.propTypes.requestingPermission,
   onClickPermissionDialog: PropTypes.func,
+  targetURL: PropTypes.string,
+  onTargetURLChange: PropTypes.func,
 };
 
 export function determineInitialIndex(teamURLs, deeplinkingUrl) {

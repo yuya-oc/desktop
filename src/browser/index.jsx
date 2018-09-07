@@ -173,14 +173,20 @@ class App extends React.Component {
     super();
     this.state = {
       tabIndex: initialIndex,
+      targetURL: '',
     };
     this.handleChangeTabIndex = this.handleChangeTabIndex.bind(this);
+    this.handleTargetURLChange = this.handleTargetURLChange.bind(this);
   }
 
   handleChangeTabIndex(newTabIndex) {
     this.setState({
       tabIndex: newTabIndex,
     });
+  }
+
+  handleTargetURLChange(targetURL) {
+    this.setState({targetURL});
   }
 
   render() {
@@ -197,6 +203,8 @@ class App extends React.Component {
         showAddServerButton={buildConfig.enableServerManagement}
         requestingPermission={requestingPermission}
         onClickPermissionDialog={handleClickPermissionDialog}
+        targetURL={this.state.targetURL}
+        onTargetURLChange={this.handleTargetURLChange}
       />
     );
   }
