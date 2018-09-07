@@ -1,6 +1,9 @@
 // Copyright (c) 2015-2016 Yuya Ochiai
 // Copyright (c) 2016-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
+/* eslint-disable react/no-set-state */
+
 'use strict';
 
 import './css/index.css';
@@ -19,7 +22,7 @@ import buildConfig from '../common/config/buildConfig';
 import settings from '../common/settings';
 import utils from '../utils/util';
 
-import MainPage from './components/MainPage.jsx';
+import MainPage, {determineInitialIndex} from './components/MainPage.jsx';
 import AppConfig from './config/AppConfig.js';
 import {createDataURL as createBadgeDataURL} from './js/badge';
 
@@ -157,28 +160,49 @@ function handleSelectSpellCheckerLocale(locale) {
 }
 
 const parsedURL = url.parse(window.location.href, true);
-const initialIndex = parsedURL.query.index ? parseInt(parsedURL.query.index, 10) : 0;
+let initialIndex = parsedURL.query.index ? parseInt(parsedURL.query.index, 10) : 0;
 
 let deeplinkingUrl = null;
 if (!parsedURL.query.index || parsedURL.query.index === null) {
   deeplinkingUrl = remote.getCurrentWindow().deeplinkingUrl;
+  initialIndex = determineInitialIndex(teams.map((t) => t.url), deeplinkingUrl);
 }
 
-ReactDOM.render(
-  <MainPage
-    teams={teams}
-    initialIndex={initialIndex}
-    onUnreadCountChange={showUnreadBadge}
-    onTeamConfigChange={teamConfigChange}
-    useSpellChecker={AppConfig.data.useSpellChecker}
-    onSelectSpellCheckerLocale={handleSelectSpellCheckerLocale}
-    deeplinkingUrl={deeplinkingUrl}
-    showAddServerButton={buildConfig.enableServerManagement}
-    requestingPermission={requestingPermission}
-    onClickPermissionDialog={handleClickPermissionDialog}
-  />,
-  document.getElementById('content')
-);
+class App extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      tabIndex: initialIndex,
+    };
+    this.handleChangeTabIndex = this.handleChangeTabIndex.bind(this);
+  }
+
+  handleChangeTabIndex(newTabIndex) {
+    this.setState({
+      tabIndex: newTabIndex,
+    });
+  }
+
+  render() {
+    return (
+      <MainPage
+        teams={teams}
+        tabIndex={this.state.tabIndex}
+        onChangeTabIndex={this.handleChangeTabIndex}
+        onUnreadCountChange={showUnreadBadge}
+        onTeamConfigChange={teamConfigChange}
+        useSpellChecker={AppConfig.data.useSpellChecker}
+        onSelectSpellCheckerLocale={handleSelectSpellCheckerLocale}
+        deeplinkingUrl={deeplinkingUrl}
+        showAddServerButton={buildConfig.enableServerManagement}
+        requestingPermission={requestingPermission}
+        onClickPermissionDialog={handleClickPermissionDialog}
+      />
+    );
+  }
+}
+
+ReactDOM.render(<App/>, document.getElementById('content'));
 
 // Deny drag&drop navigation in mainWindow.
 // Drag&drop is allowed in webview of index.html.

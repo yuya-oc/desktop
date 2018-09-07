@@ -2,8 +2,6 @@
 // Copyright (c) 2016-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-/* eslint-disable react/no-set-state */
-
 import url from 'url';
 
 import React from 'react';
@@ -27,18 +25,7 @@ export default class MainPage extends React.Component {
   constructor(props) {
     super(props);
 
-    let key = this.props.initialIndex;
-    if (this.props.deeplinkingUrl !== null) {
-      for (let i = 0; i < this.props.teams.length; i++) {
-        if (this.props.deeplinkingUrl.includes(this.props.teams[i].url)) {
-          key = i;
-          break;
-        }
-      }
-    }
-
     this.state = {
-      key,
       unreadCounts: new Array(this.props.teams.length),
       mentionCounts: new Array(this.props.teams.length),
       unreadAtActive: new Array(this.props.teams.length),
@@ -83,23 +70,23 @@ export default class MainPage extends React.Component {
       this.handleSelect(key);
     });
     ipcRenderer.on('select-next-tab', () => {
-      this.handleSelect(this.state.key + 1);
+      this.handleSelect(this.props.tabIndex + 1);
     });
     ipcRenderer.on('select-previous-tab', () => {
-      this.handleSelect(this.state.key - 1);
+      this.handleSelect(this.props.tabIndex - 1);
     });
 
     // reload the activated tab
     ipcRenderer.on('reload-tab', () => {
-      this.refs[`mattermostView${this.state.key}`].reload();
+      this.refs[`mattermostView${this.props.tabIndex}`].reload();
     });
     ipcRenderer.on('clear-cache-and-reload-tab', () => {
-      this.refs[`mattermostView${this.state.key}`].clearCacheAndReload();
+      this.refs[`mattermostView${this.props.tabIndex}`].clearCacheAndReload();
     });
 
     function focusListener() {
-      self.handleOnTeamFocused(self.state.key);
-      self.refs[`mattermostView${self.state.key}`].focusOnWebView();
+      self.handleOnTeamFocused(self.props.tabIndex);
+      self.refs[`mattermostView${self.props.tabIndex}`].focusOnWebView();
     }
 
     const currentWindow = remote.getCurrentWindow();
@@ -115,14 +102,14 @@ export default class MainPage extends React.Component {
 
     //goBack and goForward
     ipcRenderer.on('go-back', () => {
-      const mattermost = self.refs[`mattermostView${self.state.key}`];
+      const mattermost = self.refs[`mattermostView${self.props.tabIndex}`];
       if (mattermost.canGoBack()) {
         mattermost.goBack();
       }
     });
 
     ipcRenderer.on('go-forward', () => {
-      const mattermost = self.refs[`mattermostView${self.state.key}`];
+      const mattermost = self.refs[`mattermostView${self.props.tabIndex}`];
       if (mattermost.canGoForward()) {
         mattermost.goForward();
       }
@@ -140,7 +127,7 @@ export default class MainPage extends React.Component {
       const lastUrlDomain = Utils.getDomain(deepLinkUrl);
       for (let i = 0; i < this.props.teams.length; i++) {
         if (lastUrlDomain === Utils.getDomain(self.refs[`mattermostView${i}`].getSrc())) {
-          if (this.state.key !== i) {
+          if (this.props.tabIndex !== i) {
             this.handleSelect(i);
           }
           self.refs[`mattermostView${i}`].handleDeepLink(deepLinkUrl.replace(lastUrlDomain, ''));
@@ -154,23 +141,26 @@ export default class MainPage extends React.Component {
     });
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.key !== this.state.key) { // i.e. When tab has been changed
-      this.refs[`mattermostView${this.state.key}`].focusOnWebView();
+  componentDidUpdate(prevProps) {
+    if (prevProps.tabIndex !== this.props.tabIndex) { // i.e. When tab has been changed
+      this.refs[`mattermostView${this.props.tabIndex}`].focusOnWebView();
     }
   }
 
-  handleSelect(key) {
-    const newKey = (this.props.teams.length + key) % this.props.teams.length;
+  handleSelect(tabIndex) {
+    const newTabIndex = (this.props.teams.length + tabIndex) % this.props.teams.length;
     this.setState({
-      key: newKey,
       finderVisible: false,
     });
-    const webview = document.getElementById('mattermostView' + newKey);
-    ipcRenderer.send('update-title', {
-      title: webview.getTitle(),
-    });
-    this.handleOnTeamFocused(newKey);
+
+    const webview = document.getElementById('mattermostView' + newTabIndex);
+    if (webview) {
+      ipcRenderer.send('update-title', {
+        title: webview.getTitle(),
+      });
+    }
+    this.handleOnTeamFocused(newTabIndex);
+    this.props.onChangeTabIndex(newTabIndex);
   }
 
   handleUnreadCountChange(index, unreadCount, mentionCount, isUnread, isMentioned) {
@@ -182,7 +172,7 @@ export default class MainPage extends React.Component {
     mentionCounts[index] = mentionCount;
 
     // Never turn on the unreadAtActive flag at current focused tab.
-    if (this.state.key !== index || !remote.getCurrentWindow().isFocused()) {
+    if (this.props.tabIndex !== index || !remote.getCurrentWindow().isFocused()) {
       unreadAtActive[index] = unreadAtActive[index] || isUnread;
       if (isMentioned) {
         mentionAtActiveCounts[index]++;
@@ -267,7 +257,7 @@ export default class MainPage extends React.Component {
 
   focusOnWebView(e) {
     if (e.target.className !== 'finder-input') {
-      this.refs[`mattermostView${this.state.key}`].focusOnWebView();
+      this.refs[`mattermostView${this.props.tabIndex}`].focusOnWebView();
     }
   }
 
@@ -303,7 +293,7 @@ export default class MainPage extends React.Component {
             mentionCounts={this.state.mentionCounts}
             unreadAtActive={this.state.unreadAtActive}
             mentionAtActiveCounts={this.state.mentionAtActiveCounts}
-            activeKey={this.state.key}
+            activeKey={this.props.tabIndex}
             onSelect={this.handleSelect}
             onAddServer={this.addServer}
             showAddServerButton={this.props.showAddServerButton}
@@ -322,7 +312,7 @@ export default class MainPage extends React.Component {
         self.handleSelect(index);
       }
       const id = 'mattermostView' + index;
-      const isActive = self.state.key === index;
+      const isActive = self.props.tabIndex === index;
 
       let teamUrl = team.url;
       const deeplinkingUrl = this.props.deeplinkingUrl;
@@ -369,13 +359,12 @@ export default class MainPage extends React.Component {
           });
         }}
         onSave={(newTeam) => {
-          this.props.teams.push(newTeam);
           this.setState({
             showNewTeamModal: false,
-            key: this.props.teams.length - 1,
           });
-          this.render();
-          this.props.onTeamConfigChange(this.props.teams);
+          const newTeams = this.props.teams.concat(newTeam);
+          this.props.onTeamConfigChange(newTeams);
+          this.handleSelect(newTeams.length - 1);
         }}
       />
     );
@@ -407,7 +396,7 @@ export default class MainPage extends React.Component {
           { viewsRow }
           { this.state.finderVisible ? (
             <Finder
-              webviewKey={this.state.key}
+              webviewKey={this.props.tabIndex}
               close={this.closeFinder}
               focusState={this.state.focusFinder}
               inputBlur={this.inputBlur}
@@ -440,7 +429,8 @@ MainPage.propTypes = {
   onUnreadCountChange: PropTypes.func.isRequired,
   teams: PropTypes.array.isRequired,
   onTeamConfigChange: PropTypes.func.isRequired,
-  initialIndex: PropTypes.number.isRequired,
+  tabIndex: PropTypes.number.isRequired,
+  onChangeTabIndex: PropTypes.func,
   useSpellChecker: PropTypes.bool.isRequired,
   onSelectSpellCheckerLocale: PropTypes.func.isRequired,
   deeplinkingUrl: PropTypes.string,
@@ -448,3 +438,14 @@ MainPage.propTypes = {
   requestingPermission: TabBar.propTypes.requestingPermission,
   onClickPermissionDialog: PropTypes.func,
 };
+
+export function determineInitialIndex(teamURLs, deeplinkingUrl) {
+  if (deeplinkingUrl === null) {
+    return 0;
+  }
+  const index = teamURLs.findIndex((teamURL) => deeplinkingUrl.includes(teamURL));
+  if (index === -1) {
+    return 0;
+  }
+  return index;
+}
