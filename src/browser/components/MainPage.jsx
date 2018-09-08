@@ -25,16 +25,10 @@ export default class MainPage extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      loginQueue: [],
-    };
-
     this.activateFinder = this.activateFinder.bind(this);
     this.addServer = this.addServer.bind(this);
     this.closeFinder = this.closeFinder.bind(this);
     this.focusOnWebView = this.focusOnWebView.bind(this);
-    this.handleLogin = this.handleLogin.bind(this);
-    this.handleLoginCancel = this.handleLoginCancel.bind(this);
     this.handleOnTeamFocused = this.handleOnTeamFocused.bind(this);
     this.handleSelect = this.handleSelect.bind(this);
     this.handleTargetURLChange = this.handleTargetURLChange.bind(this);
@@ -46,19 +40,6 @@ export default class MainPage extends React.Component {
 
   componentDidMount() {
     const self = this;
-    ipcRenderer.on('login-request', (event, request, authInfo) => {
-      self.setState({
-        loginRequired: true,
-      });
-      const loginQueue = self.state.loginQueue;
-      loginQueue.push({
-        request,
-        authInfo,
-      });
-      self.setState({
-        loginQueue,
-      });
-    });
 
     // can't switch tabs sequencially for some reason...
     ipcRenderer.on('switch-tab', (event, key) => {
@@ -212,19 +193,6 @@ export default class MainPage extends React.Component {
     this.markReadAtActive(index);
   }
 
-  handleLogin(request, username, password) {
-    ipcRenderer.send('login-credentials', request, username, password);
-    const loginQueue = this.state.loginQueue;
-    loginQueue.shift();
-    this.setState({loginQueue});
-  }
-
-  handleLoginCancel() {
-    const loginQueue = this.state.loginQueue;
-    loginQueue.shift();
-    this.setState({loginQueue});
-  }
-
   handleTargetURLChange(targetURL) {
     clearTimeout(this.targetURLDisappearTimeout);
     if (targetURL === '') {
@@ -332,11 +300,11 @@ export default class MainPage extends React.Component {
     let request = null;
     let authServerURL = null;
     let authInfo = null;
-    if (this.state.loginQueue.length !== 0) {
-      request = this.state.loginQueue[0].request;
-      const tmpURL = url.parse(this.state.loginQueue[0].request.url);
+    if (this.props.loginQueue.length !== 0) {
+      request = this.props.loginQueue[0].request;
+      const tmpURL = url.parse(this.props.loginQueue[0].request.url);
       authServerURL = `${tmpURL.protocol}//${tmpURL.host}`;
-      authInfo = this.state.loginQueue[0].authInfo;
+      authInfo = this.props.loginQueue[0].authInfo;
     }
     const modal = (
       <NewTeamModal
@@ -362,12 +330,12 @@ export default class MainPage extends React.Component {
         onClick={this.focusOnWebView}
       >
         <LoginModal
-          show={this.state.loginQueue.length !== 0}
+          show={this.props.loginQueue.length !== 0}
           request={request}
           authInfo={authInfo}
           authServerURL={authServerURL}
-          onLogin={this.handleLogin}
-          onCancel={this.handleLoginCancel}
+          onLogin={this.props.onLogin}
+          onCancel={this.props.onLoginCancel}
         />
         {this.props.teams.length === 1 && this.props.requestingPermission[0] ? // eslint-disable-line multiline-ternary
           <PermissionRequestDialog
@@ -432,6 +400,9 @@ MainPage.propTypes = {
   unreadAtActive: PropTypes.array,
   mentionAtActiveCounts: PropTypes.array,
   onUnreadCountChange: PropTypes.func,
+  loginQueue: PropTypes.array,
+  onLogin: PropTypes.func,
+  onLoginCancel: PropTypes.func,
 };
 
 export function determineInitialIndex(teamURLs, deeplinkingUrl) {

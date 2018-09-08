@@ -178,10 +178,24 @@ class App extends React.Component {
       mentionCounts: new Array(teams.length),
       unreadAtActive: new Array(teams.length),
       mentionAtActiveCounts: new Array(teams.length),
+      loginQueue: [],
     };
     this.handleChangeTabIndex = this.handleChangeTabIndex.bind(this);
     this.handleTargetURLChange = this.handleTargetURLChange.bind(this);
     this.handleUnreadCountChange = this.handleUnreadCountChange.bind(this);
+    this.handleLogin = this.handleLogin.bind(this);
+    this.handleLoginCancel = this.handleLoginCancel.bind(this);
+  }
+
+  componentDidMount() {
+    ipcRenderer.on('login-request', (event, request, authInfo) => {
+      this.setState((prevState) => ({
+        loginQueue: prevState.loginQueue.concat({
+          request,
+          authInfo,
+        }),
+      }));
+    });
   }
 
   handleChangeTabIndex(newTabIndex) {
@@ -201,6 +215,19 @@ class App extends React.Component {
       unreadAtActive,
       mentionAtActiveCounts,
     });
+  }
+
+  handleLogin(request, username, password) {
+    ipcRenderer.send('login-credentials', request, username, password);
+    this.setState((prevState) => ({
+      loginQueue: prevState.loginQueue.slice(1),
+    }));
+  }
+
+  handleLoginCancel() {
+    this.setState((prevState) => ({
+      loginQueue: prevState.loginQueue.slice(1),
+    }));
   }
 
   render() {
@@ -224,6 +251,9 @@ class App extends React.Component {
         unreadAtActive={this.state.unreadAtActive}
         mentionAtActiveCounts={this.state.mentionAtActiveCounts}
         onUnreadCountChange={this.handleUnreadCountChange}
+        loginQueue={this.state.loginQueue}
+        onLogin={this.handleLogin}
+        onLoginCancel={this.handleLoginCancel}
       />
     );
   }
