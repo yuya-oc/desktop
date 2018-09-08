@@ -174,9 +174,14 @@ class App extends React.Component {
     this.state = {
       tabIndex: initialIndex,
       targetURL: '',
+      unreadCounts: new Array(teams.length),
+      mentionCounts: new Array(teams.length),
+      unreadAtActive: new Array(teams.length),
+      mentionAtActiveCounts: new Array(teams.length),
     };
     this.handleChangeTabIndex = this.handleChangeTabIndex.bind(this);
     this.handleTargetURLChange = this.handleTargetURLChange.bind(this);
+    this.handleUnreadCountChange = this.handleUnreadCountChange.bind(this);
   }
 
   handleChangeTabIndex(newTabIndex) {
@@ -189,13 +194,22 @@ class App extends React.Component {
     this.setState({targetURL});
   }
 
+  handleUnreadCountChange(unreadCounts, mentionCounts, unreadAtActive, mentionAtActiveCounts) {
+    this.setState({
+      unreadCounts,
+      mentionCounts,
+      unreadAtActive,
+      mentionAtActiveCounts,
+    });
+  }
+
   render() {
     return (
       <MainPage
         teams={teams}
         tabIndex={this.state.tabIndex}
         onChangeTabIndex={this.handleChangeTabIndex}
-        onUnreadCountChange={showUnreadBadge}
+        onUnreadCountTotalChange={showUnreadBadge}
         onTeamConfigChange={teamConfigChange}
         useSpellChecker={AppConfig.data.useSpellChecker}
         onSelectSpellCheckerLocale={handleSelectSpellCheckerLocale}
@@ -205,6 +219,11 @@ class App extends React.Component {
         onClickPermissionDialog={handleClickPermissionDialog}
         targetURL={this.state.targetURL}
         onTargetURLChange={this.handleTargetURLChange}
+        unreadCounts={this.state.unreadCounts}
+        mentionCounts={this.state.mentionCounts}
+        unreadAtActive={this.state.unreadAtActive}
+        mentionAtActiveCounts={this.state.mentionAtActiveCounts}
+        onUnreadCountChange={this.handleUnreadCountChange}
       />
     );
   }

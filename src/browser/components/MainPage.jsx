@@ -26,10 +26,6 @@ export default class MainPage extends React.Component {
     super(props);
 
     this.state = {
-      unreadCounts: new Array(this.props.teams.length),
-      mentionCounts: new Array(this.props.teams.length),
-      unreadAtActive: new Array(this.props.teams.length),
-      mentionAtActiveCounts: new Array(this.props.teams.length),
       loginQueue: [],
     };
 
@@ -163,10 +159,10 @@ export default class MainPage extends React.Component {
   }
 
   handleUnreadCountChange(index, unreadCount, mentionCount, isUnread, isMentioned) {
-    const unreadCounts = this.state.unreadCounts;
-    const mentionCounts = this.state.mentionCounts;
-    const unreadAtActive = this.state.unreadAtActive;
-    const mentionAtActiveCounts = this.state.mentionAtActiveCounts;
+    const unreadCounts = this.props.unreadCounts.concat();
+    const mentionCounts = this.props.mentionCounts.concat();
+    const unreadAtActive = this.props.unreadAtActive.concat();
+    const mentionAtActiveCounts = this.props.mentionAtActiveCounts.concat();
     unreadCounts[index] = unreadCount;
     mentionCounts[index] = mentionCount;
 
@@ -177,44 +173,37 @@ export default class MainPage extends React.Component {
         mentionAtActiveCounts[index]++;
       }
     }
-    this.setState({
-      unreadCounts,
-      mentionCounts,
-      unreadAtActive,
-      mentionAtActiveCounts,
-    });
+    this.props.onUnreadCountChange(unreadCounts, mentionCounts, unreadAtActive, mentionAtActiveCounts);
     this.handleUnreadCountTotalChange();
   }
 
   markReadAtActive(index) {
-    const unreadAtActive = this.state.unreadAtActive;
-    const mentionAtActiveCounts = this.state.mentionAtActiveCounts;
+    const unreadAtActive = this.props.unreadAtActive.concat();
+    const mentionAtActiveCounts = this.props.mentionAtActiveCounts.concat();
+
     unreadAtActive[index] = false;
     mentionAtActiveCounts[index] = 0;
-    this.setState({
-      unreadAtActive,
-      mentionAtActiveCounts,
-    });
+    this.props.onUnreadCountChange(this.props.unreadCounts, this.props.mentionCounts, unreadAtActive, mentionAtActiveCounts);
     this.handleUnreadCountTotalChange();
   }
 
   handleUnreadCountTotalChange() {
     if (this.props.onUnreadCountChange) {
-      let allUnreadCount = this.state.unreadCounts.reduce((prev, curr) => {
+      let allUnreadCount = this.props.unreadCounts.reduce((prev, curr) => {
         return prev + curr;
       }, 0);
-      this.state.unreadAtActive.forEach((state) => {
+      this.props.unreadAtActive.forEach((state) => {
         if (state) {
           allUnreadCount += 1;
         }
       });
-      let allMentionCount = this.state.mentionCounts.reduce((prev, curr) => {
+      let allMentionCount = this.props.mentionCounts.reduce((prev, curr) => {
         return prev + curr;
       }, 0);
-      this.state.mentionAtActiveCounts.forEach((count) => {
+      this.props.mentionAtActiveCounts.forEach((count) => {
         allMentionCount += count;
       });
-      this.props.onUnreadCountChange(allUnreadCount, allMentionCount);
+      this.props.onUnreadCountTotalChange(allUnreadCount, allMentionCount);
     }
   }
 
@@ -288,10 +277,10 @@ export default class MainPage extends React.Component {
           <TabBar
             id='tabBar'
             teams={this.props.teams}
-            unreadCounts={this.state.unreadCounts}
-            mentionCounts={this.state.mentionCounts}
-            unreadAtActive={this.state.unreadAtActive}
-            mentionAtActiveCounts={this.state.mentionAtActiveCounts}
+            unreadCounts={this.props.unreadCounts}
+            mentionCounts={this.props.mentionCounts}
+            unreadAtActive={this.props.unreadAtActive}
+            mentionAtActiveCounts={this.props.mentionAtActiveCounts}
             activeKey={this.props.tabIndex}
             onSelect={this.handleSelect}
             onAddServer={this.addServer}
@@ -425,7 +414,7 @@ export default class MainPage extends React.Component {
 }
 
 MainPage.propTypes = {
-  onUnreadCountChange: PropTypes.func.isRequired,
+  onUnreadCountTotalChange: PropTypes.func.isRequired,
   teams: PropTypes.array.isRequired,
   onTeamConfigChange: PropTypes.func.isRequired,
   tabIndex: PropTypes.number.isRequired,
@@ -438,6 +427,11 @@ MainPage.propTypes = {
   onClickPermissionDialog: PropTypes.func,
   targetURL: PropTypes.string,
   onTargetURLChange: PropTypes.func,
+  unreadCounts: PropTypes.array,
+  mentionCounts: PropTypes.array,
+  unreadAtActive: PropTypes.array,
+  mentionAtActiveCounts: PropTypes.array,
+  onUnreadCountChange: PropTypes.func,
 };
 
 export function determineInitialIndex(teamURLs, deeplinkingUrl) {
