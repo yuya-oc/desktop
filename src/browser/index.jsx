@@ -257,8 +257,8 @@ class App extends React.Component {
   render() {
     return (
       <MainPage
+        {...this.state}
         teams={teams}
-        tabIndex={this.state.tabIndex}
         onChangeTabIndex={this.handleChangeTabIndex}
         onUnreadCountTotalChange={showUnreadBadge}
         onTeamConfigChange={teamConfigChange}
@@ -268,17 +268,10 @@ class App extends React.Component {
         showAddServerButton={buildConfig.enableServerManagement}
         requestingPermission={requestingPermission}
         onClickPermissionDialog={handleClickPermissionDialog}
-        targetURL={this.state.targetURL}
         onTargetURLChange={this.handleTargetURLChange}
-        unreadCounts={this.state.unreadCounts}
-        mentionCounts={this.state.mentionCounts}
-        unreadAtActive={this.state.unreadAtActive}
-        mentionAtActiveCounts={this.state.mentionAtActiveCounts}
         onUnreadCountChange={this.handleUnreadCountChange}
-        loginQueue={this.state.loginQueue}
         onLogin={this.handleLogin}
         onLoginCancel={this.handleLoginCancel}
-        finderVisible={this.state.finderVisible}
         onCloseFinder={this.handleCloseFinder}
         onBlurFinder={this.handleBlurFinder}
       />
