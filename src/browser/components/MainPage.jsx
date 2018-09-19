@@ -25,16 +25,17 @@ export default class MainPage extends React.Component {
   constructor(props) {
     super(props);
 
-    this.activateFinder = this.activateFinder.bind(this);
+    this.state = {
+      showNewTeamModal: false,
+    };
+
     this.addServer = this.addServer.bind(this);
-    this.closeFinder = this.closeFinder.bind(this);
     this.focusOnWebView = this.focusOnWebView.bind(this);
     this.handleOnTeamFocused = this.handleOnTeamFocused.bind(this);
     this.handleSelect = this.handleSelect.bind(this);
     this.handleTargetURLChange = this.handleTargetURLChange.bind(this);
     this.handleUnreadCountChange = this.handleUnreadCountChange.bind(this);
     this.handleUnreadCountTotalChange = this.handleUnreadCountTotalChange.bind(this);
-    this.inputBlur = this.inputBlur.bind(this);
     this.markReadAtActive = this.markReadAtActive.bind(this);
   }
 
@@ -111,10 +112,6 @@ export default class MainPage extends React.Component {
         }
       }
     });
-
-    ipcRenderer.on('toggle-find', () => {
-      this.activateFinder(true);
-    });
   }
 
   componentDidUpdate(prevProps) {
@@ -125,10 +122,6 @@ export default class MainPage extends React.Component {
 
   handleSelect(tabIndex) {
     const newTabIndex = (this.props.teams.length + tabIndex) % this.props.teams.length;
-    this.setState({
-      finderVisible: false,
-    });
-
     const webview = document.getElementById('mattermostView' + newTabIndex);
     if (webview) {
       ipcRenderer.send('update-title', {
@@ -215,25 +208,6 @@ export default class MainPage extends React.Component {
     if (e.target.className !== 'finder-input') {
       this.refs[`mattermostView${this.props.tabIndex}`].focusOnWebView();
     }
-  }
-
-  activateFinder() {
-    this.setState({
-      finderVisible: true,
-      focusFinder: true,
-    });
-  }
-
-  closeFinder() {
-    this.setState({
-      finderVisible: false,
-    });
-  }
-
-  inputBlur() {
-    this.setState({
-      focusFinder: false,
-    });
   }
 
   render() {
@@ -350,12 +324,12 @@ export default class MainPage extends React.Component {
         <Grid fluid={true}>
           { tabsRow }
           { viewsRow }
-          { this.state.finderVisible ? (
+          { this.props.finderVisible ? (
             <Finder
               webviewKey={this.props.tabIndex}
-              close={this.closeFinder}
-              focusState={this.state.focusFinder}
-              inputBlur={this.inputBlur}
+              close={this.props.onCloseFinder}
+              focusState={this.props.focusFinder}
+              inputBlur={this.props.onBlurFinder}
             />
           ) : null}
         </Grid>
@@ -403,6 +377,10 @@ MainPage.propTypes = {
   loginQueue: PropTypes.array,
   onLogin: PropTypes.func,
   onLoginCancel: PropTypes.func,
+  finderVisible: PropTypes.bool,
+  focusFinder: PropTypes.bool,
+  onCloseFinder: PropTypes.func,
+  onBlurFinder: PropTypes.func,
 };
 
 export function determineInitialIndex(teamURLs, deeplinkingUrl) {

@@ -179,12 +179,16 @@ class App extends React.Component {
       unreadAtActive: new Array(teams.length),
       mentionAtActiveCounts: new Array(teams.length),
       loginQueue: [],
+      finderVisible: false,
+      focusFinder: false,
     };
     this.handleChangeTabIndex = this.handleChangeTabIndex.bind(this);
     this.handleTargetURLChange = this.handleTargetURLChange.bind(this);
     this.handleUnreadCountChange = this.handleUnreadCountChange.bind(this);
     this.handleLogin = this.handleLogin.bind(this);
     this.handleLoginCancel = this.handleLoginCancel.bind(this);
+    this.handleCloseFinder = this.handleCloseFinder.bind(this);
+    this.handleBlurFinder = this.handleBlurFinder.bind(this);
   }
 
   componentDidMount() {
@@ -196,11 +200,19 @@ class App extends React.Component {
         }),
       }));
     });
+
+    ipcRenderer.on('toggle-find', () => {
+      this.setState({
+        finderVisible: true,
+        focusFinder: true,
+      });
+    });
   }
 
   handleChangeTabIndex(newTabIndex) {
     this.setState({
       tabIndex: newTabIndex,
+      finderVisible: false,
     });
   }
 
@@ -230,6 +242,18 @@ class App extends React.Component {
     }));
   }
 
+  handleCloseFinder() {
+    this.setState({
+      finderVisible: false,
+    });
+  }
+
+  handleBlurFinder() {
+    this.setState({
+      focusFinder: false,
+    });
+  }
+
   render() {
     return (
       <MainPage
@@ -254,6 +278,9 @@ class App extends React.Component {
         loginQueue={this.state.loginQueue}
         onLogin={this.handleLogin}
         onLoginCancel={this.handleLoginCancel}
+        finderVisible={this.state.finderVisible}
+        onCloseFinder={this.handleCloseFinder}
+        onBlurFinder={this.handleBlurFinder}
       />
     );
   }
