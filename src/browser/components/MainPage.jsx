@@ -2,6 +2,8 @@
 // Copyright (c) 2016-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+/* eslint "react/no-set-state": 2 */
+
 import url from 'url';
 
 import React from 'react';
