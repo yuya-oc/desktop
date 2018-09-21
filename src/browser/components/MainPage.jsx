@@ -27,11 +27,6 @@ export default class MainPage extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      showNewTeamModal: false,
-    };
-
-    this.addServer = this.addServer.bind(this);
     this.focusOnWebView = this.focusOnWebView.bind(this);
     this.handleOnTeamFocused = this.handleOnTeamFocused.bind(this);
     this.handleSelect = this.handleSelect.bind(this);
@@ -92,10 +87,6 @@ export default class MainPage extends React.Component {
       if (mattermost.canGoForward()) {
         mattermost.goForward();
       }
-    });
-
-    ipcRenderer.on('add-server', () => {
-      this.addServer();
     });
 
     ipcRenderer.on('focus-on-webview', () => {
@@ -200,12 +191,6 @@ export default class MainPage extends React.Component {
     }
   }
 
-  addServer() {
-    this.setState({
-      showNewTeamModal: true,
-    });
-  }
-
   focusOnWebView(e) {
     if (e.target.className !== 'finder-input') {
       this.refs[`mattermostView${this.props.tabIndex}`].focusOnWebView();
@@ -227,7 +212,7 @@ export default class MainPage extends React.Component {
             mentionAtActiveCounts={this.props.mentionAtActiveCounts}
             activeKey={this.props.tabIndex}
             onSelect={this.handleSelect}
-            onAddServer={this.addServer}
+            onAddServer={this.props.onClickAddServer}
             showAddServerButton={this.props.showAddServerButton}
             requestingPermission={this.props.requestingPermission}
             onClickPermissionDialog={this.props.onClickPermissionDialog}
@@ -284,16 +269,10 @@ export default class MainPage extends React.Component {
     }
     const modal = (
       <NewTeamModal
-        show={this.state.showNewTeamModal}
-        onClose={() => {
-          this.setState({
-            showNewTeamModal: false,
-          });
-        }}
+        show={this.props.showNewTeamModal}
+        onClose={this.props.onCloseNewTeamModal}
         onSave={(newTeam) => {
-          this.setState({
-            showNewTeamModal: false,
-          });
+          this.props.onCloseNewTeamModal();
           const newTeams = this.props.teams.concat(newTeam);
           this.props.onTeamConfigChange(newTeams);
           this.handleSelect(newTeams.length - 1);
@@ -383,6 +362,9 @@ MainPage.propTypes = {
   focusFinder: PropTypes.bool,
   onCloseFinder: PropTypes.func,
   onBlurFinder: PropTypes.func,
+  showNewTeamModal: PropTypes.bool,
+  onCloseNewTeamModal: PropTypes.func,
+  onClickAddServer: PropTypes.func,
 };
 
 export function determineInitialIndex(teamURLs, deeplinkingUrl) {

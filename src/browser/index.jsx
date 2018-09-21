@@ -181,6 +181,7 @@ class App extends React.Component {
       loginQueue: [],
       finderVisible: false,
       focusFinder: false,
+      showNewTeamModal: false,
     };
     this.handleChangeTabIndex = this.handleChangeTabIndex.bind(this);
     this.handleTargetURLChange = this.handleTargetURLChange.bind(this);
@@ -189,6 +190,8 @@ class App extends React.Component {
     this.handleLoginCancel = this.handleLoginCancel.bind(this);
     this.handleCloseFinder = this.handleCloseFinder.bind(this);
     this.handleBlurFinder = this.handleBlurFinder.bind(this);
+    this.handleCloseNewTeamModal = this.handleCloseNewTeamModal.bind(this);
+    this.handleClickAddServer = this.handleClickAddServer.bind(this);
   }
 
   componentDidMount() {
@@ -205,6 +208,12 @@ class App extends React.Component {
       this.setState({
         finderVisible: true,
         focusFinder: true,
+      });
+    });
+
+    ipcRenderer.on('add-server', () => {
+      this.setState({
+        showNewTeamModal: true,
       });
     });
   }
@@ -254,6 +263,18 @@ class App extends React.Component {
     });
   }
 
+  handleCloseNewTeamModal() {
+    this.setState({
+      showNewTeamModal: false,
+    });
+  }
+
+  handleClickAddServer() {
+    this.setState({
+      showNewTeamModal: true,
+    });
+  }
+
   render() {
     return (
       <MainPage
@@ -274,6 +295,8 @@ class App extends React.Component {
         onLoginCancel={this.handleLoginCancel}
         onCloseFinder={this.handleCloseFinder}
         onBlurFinder={this.handleBlurFinder}
+        onCloseNewTeamModal={this.handleCloseNewTeamModal}
+        onClickAddServer={this.handleClickAddServer}
       />
     );
   }
