@@ -45,7 +45,17 @@ describe('browser/index.html', function desc() {
 
   afterEach(async () => {
     if (this.app && this.app.isRunning()) {
+      const pid = await this.app.mainProcess.pid();
       await this.app.stop();
+      if (process.env.CI) {
+        try {
+          process.kill(pid);
+        } catch (err) {
+          if (err.message.match(/ESRCH/) === null) {
+            throw err;
+          }
+        }
+      }
     }
   });
 
