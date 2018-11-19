@@ -117,7 +117,8 @@ describe('browser/index.html', function desc() {
       }],
     }));
     await this.app.restart();
-    await this.app.client.waitUntilWindowLoaded().pause(2000);
+    await this.app.client.waitUntilWindowLoaded();
+    await this.app.client.waitForVisible('#mattermostView0', 5000).pause(2000);
     const windowTitle = await this.app.browserWindow.getTitle();
     windowTitle.should.equal('Mattermost Desktop testing html');
   });
